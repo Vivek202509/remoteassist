@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RemoteAssist</string>
+    <string name="accessibility_desc">Used only to perform taps, swipes and text input during a remote-control session that you have approved. RemoteAssist does not read your screen content or data from other apps.</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose supplies the real theming; this keeps the app/activity bootable
+         before the first frame and while system dialogs show. -->
+    <style name="Theme.RemoteAssist" parent="android:Theme.Material.Light.NoActionBar"/>
+</resources>

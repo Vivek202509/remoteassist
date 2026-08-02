@@ -1,0 +1,21 @@
+{
+  "name": "remoteassist-signaling",
+  "version": "1.0.0",
+  "description": "Signaling + pairing broker and FCM wake service for RemoteAssist",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "smoke": "node test/smoke.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "optionalDependencies": {
+    "firebase-admin": "^12.5.0"
+  }
+}

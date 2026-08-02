@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Networking -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+
+    <!-- Foreground services -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+
+    <!-- Notifications (Android 13+) + call-style incoming session -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
+
+    <!-- Keep CPU alive during an active session -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <!-- Overlay indicator during control -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
+    <!-- QR scanning (controller joins by scanning the host's code) -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera.any" android:required="false"/>
+
+    <!-- Optional: include only if you actually stream device audio -->
+    <!-- <uses-permission android:name="android.permission.RECORD_AUDIO"/> -->
+
+    <application
+        android:name=".RemoteApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.RemoteAssist">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.RemoteAssist">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <!-- HOST: screen-capture foreground service -->
+        <service
+            android:name=".host.ScreenCaptureService"
+            android:foregroundServiceType="mediaProjection"
+            android:exported="false"/>
+
+        <!-- HOST: persistent unattended service (holds projection open) -->
+        <service
+            android:name=".host.UnattendedHostService"
+            android:foregroundServiceType="mediaProjection"
+            android:exported="false"/>
+
+        <!-- HOST: short-lived signaling reconnect service (used on FCM wake) -->
+        <service
+            android:name=".host.SignalingService"
+            android:foregroundServiceType="connectedDevice"
+            android:exported="false"/>
+
+        <!-- HOST: remote input via AccessibilityService -->
+        <service
+            android:name=".host.RemoteInputService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/remote_input_config"/>
+        </service>
+
+        <!-- FCM wake receiver -->
+        <service
+            android:name=".fcm.RemoteFcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="incoming"/>
+
+    </application>
+</manifest>

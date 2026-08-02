@@ -1,0 +1,34 @@
+RemoteAssist — Remote Support & Access
+Demo video transcript (for Play review)
+
+LEFT = HOST (the controlled device)   RIGHT = CONTROLLER (the controlling device)
+
+---
+
+RemoteAssist is a remote-support and remote-access tool. This demo shows the consent-first setup and how remote control works.
+
+The app icon is always visible in the launcher. It can never be hidden.
+
+Before enabling Accessibility, the app clearly explains what it will do. It states that it does NOT read your screen content or data from other apps.
+
+The user grants Accessibility in Android Settings themselves. It is used ONLY to send taps, swipes, and text during an approved remote session.
+
+The HOST generates a one-time code. Nothing happens until the host approves.
+
+The CONTROLLER enters the code to request a connection.
+
+The HOST must explicitly approve the session. It sees exactly what will be shared before allowing.
+
+Screen capture begins only after Android's own system consent dialog.
+
+A persistent, non-dismissible notification is shown the entire time the screen is shared. This is a foreground service of type mediaProjection. The "End now" action stops it instantly.
+
+The CONTROLLER's taps, swipes, and text are performed on the HOST in real time. Accessibility is used only to inject this input — no screen data is read or stored.
+
+Either side can end the session at any time. The notification clears when the session ends.
+
+Paired devices and access can be revoked at any time.
+
+Unattended access is set up by the device owner, behind authentication. It is only available for a previously paired device, and it shows its own always-on notification.
+
+RemoteAssist requires consent on the controlled device, is always visible, and is revocable anytime. It is never hidden.

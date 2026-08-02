@@ -1,0 +1,24 @@
+# Local Gradle distribution (machine-specific; wrapper points here as a network workaround)
+.gradle-dist/
+
+# Node
+server/node_modules/
+server/.env
+npm-debug.log*
+
+# Android / Gradle
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/captures/
+*.iml
+.DS_Store
+
+# Firebase
+android/app/google-services.json
+
+# Keystores
+*.jks
+*.keystore

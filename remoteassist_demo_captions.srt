@@ -1,0 +1,97 @@
+1
+00:00:00,000 --> 00:00:06,000
+RemoteAssist — Remote Support & Access
+LEFT = HOST (controlled)   RIGHT = CONTROLLER
+
+2
+00:00:06,000 --> 00:00:14,000
+The app icon is always visible in the launcher.
+It can never be hidden.
+
+3
+00:00:14,000 --> 00:00:22,000
+Before enabling Accessibility, the app clearly
+explains what it will do.
+
+4
+00:00:22,000 --> 00:00:30,000
+It states it does NOT read your screen content
+or data from other apps.
+
+5
+00:00:30,000 --> 00:00:38,000
+The user grants Accessibility in Android Settings
+themselves.
+
+6
+00:00:38,000 --> 00:00:45,000
+Used ONLY to send taps, swipes, and text
+during an approved remote session.
+
+7
+00:00:45,000 --> 00:00:56,000
+The HOST generates a one-time code.
+Nothing happens until the host approves.
+
+8
+00:00:56,000 --> 00:01:06,000
+The CONTROLLER enters the code
+to request a connection.
+
+9
+00:01:06,000 --> 00:01:13,000
+The HOST must explicitly approve the session.
+
+10
+00:01:13,000 --> 00:01:18,000
+It sees exactly what will be shared before allowing.
+
+11
+00:01:18,000 --> 00:01:28,000
+Screen capture begins only after Android's
+own system consent dialog.
+
+12
+00:01:28,000 --> 00:01:35,000
+A persistent, non-dismissible notification is shown
+the entire time the screen is shared.
+
+13
+00:01:35,000 --> 00:01:40,000
+Foreground service: mediaProjection.
+"End now" stops it instantly.
+
+14
+00:01:40,000 --> 00:01:50,000
+The CONTROLLER's taps, swipes, and text
+are performed on the HOST in real time.
+
+15
+00:01:50,000 --> 00:02:00,000
+Accessibility is used only to inject input —
+no screen data is read or stored.
+
+16
+00:02:00,000 --> 00:02:10,000
+Either side can end the session at any time.
+The notification clears when it ends.
+
+17
+00:02:10,000 --> 00:02:20,000
+Paired devices and access can be revoked
+at any time.
+
+18
+00:02:20,000 --> 00:02:30,000
+Unattended access is set up by the device owner,
+behind authentication.
+
+19
+00:02:30,000 --> 00:02:40,000
+Only for a previously paired device —
+and it shows its own always-on notification.
+
+20
+00:02:40,000 --> 00:02:44,000
+RemoteAssist — consent required, always visible,
+revocable anytime. Never hidden.
