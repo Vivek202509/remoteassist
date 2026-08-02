@@ -1,5 +1,8 @@
 # RemoteAssist
 
+[![CI](https://github.com/Vivek202509/remoteassist/actions/workflows/ci.yml/badge.svg)](https://github.com/Vivek202509/remoteassist/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A consent-first, end-to-end-encrypted **remote support / remote desktop** system for
 Android — bidirectional (either paired device can view & control the other). Built from
 the design developed in this project: WebRTC transport, a signaling + pairing broker,
