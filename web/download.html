@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download — RemoteAssist</title>
+<meta name="description" content="Build and install RemoteAssist: the Android app, the Windows host preview and the self-hosted signaling broker.">
+<meta property="og:site_name" content="RemoteAssist">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Download — RemoteAssist">
+<meta property="og:description" content="Build and install RemoteAssist: the Android app, the Windows host preview and the self-hosted signaling broker.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/site.css">
+<script>try{var s=localStorage.getItem('ra-theme');document.documentElement.setAttribute('data-theme',s||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));}catch(e){}</script>
+</head>
+<body>
+
+<svg width="0" height="0" class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/>
+  </symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3.5v11"/><polyline points="7.5 10.5 12 15 16.5 10.5"/><path d="M4 20h16"/>
+  </symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.7h3"/>
+  </symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2.5" y="4" width="19" height="12.5" rx="2"/><path d="M12 16.5V20"/><path d="M8 20h8"/>
+  </symbol>
+  <symbol id="i-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4" width="18" height="6" rx="1.6"/><rect x="3" y="14" width="18" height="6" rx="1.6"/><path d="M7 7h.01"/><path d="M7 17h.01"/>
+  </symbol>
+</svg>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="dropdown">
+      <button class="dropdown__toggle" type="button" aria-expanded="false" aria-controls="accounts-note">
+        <span data-i18n="top.accounts">Accounts</span> <span aria-hidden="true">&#9662;</span>
+      </button>
+      <div class="dropdown__menu" id="accounts-note">
+        <p class="dropdown__lead">Sign-in is not available</p>
+        <p class="dropdown__note" data-status="notices.accounts">There is no account system. Devices authenticate with their own hardware-backed keys, so there is nothing to sign in to.</p>
+      </div>
+    </div>
+    <nav class="socials" aria-label="Project links">
+      <a href="https://github.com/Vivek202509/remoteassist"><span aria-hidden="true">gh</span><span class="visually-hidden">RemoteAssist source on GitHub</span></a>
+    </nav>
+    <button class="theme-toggle" type="button" aria-pressed="false">
+      <span class="theme-toggle__icon" aria-hidden="true">&#9686;</span>
+      <span data-i18n="top.darkmode">Dark mode</span>
+    </button>
+    <div class="lang">
+      <label for="lang-select" data-i18n="top.language">Language:</label>
+      <select id="lang-select">
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <img class="brand__mark" src="assets/img/logo.svg" alt="" width="52" height="52">
+      <span>
+        <span class="brand__word"><b>REMOTE</b><span>ASSIST</span></span>
+        <span class="brand__tag">Consent-first remote control</span>
+      </span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Menu"><span></span></button>
+    <nav class="nav" id="primary-nav" aria-label="Main">
+      <ul>
+        <li><a href="index.html#features" data-i18n="nav.what">What&rsquo;s RemoteAssist?</a></li>
+        <li><a href="download.html" aria-current="page" data-i18n="nav.download">Download</a></li>
+        <li><a href="document.html" data-i18n="nav.document">Document</a></li>
+        <li><a href="pricing.html" data-i18n="nav.pricing">Pricing</a></li>
+        <li><a href="blog.html" data-i18n="nav.blog">Blog</a></li>
+        <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="page-head">
+  <div class="wrap">
+    <p class="crumbs"><a href="index.html">Home</a> / Download</p>
+    <h1>Download</h1>
+    <p>Version <span data-status="version.label">1.0 (build 1)</span>. RemoteAssist is distributed as source —
+      you build the app and run the broker yourself, which is what makes the &ldquo;no third party in the
+      middle&rdquo; claim checkable.</p>
+    <p><strong>There are no installers on this page.</strong> No signed APK and no Windows installer are
+      published anywhere, so every route below is a build from source.</p>
+  </div>
+</section>
+
+<div class="strip">
+  <div class="wrap">
+    <span class="strip__item"><svg aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> MIT licence, no telemetry</span>
+    <span class="strip__item"><svg aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> Android <span data-status="requirements.android">8.0 – 15 · API 26–35</span></span>
+    <span class="strip__item"><svg aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> Broker: <span data-status="requirements.node">Node.js 18+</span></span>
+    <span class="strip__item"><svg aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> <span data-status="checks.protocol">229</span> protocol + <span data-status="checks.broker">46</span> broker checks pass here</span>
+  </div>
+</div>
+
+<section class="section">
+  <div class="wrap">
+    <div data-tabs>
+      <div class="tabs" role="tablist" aria-label="Download targets">
+        <button type="button" role="tab" id="tab-android" aria-controls="panel-android" aria-selected="true" data-os="android">
+          <svg width="15" height="15" class="ico-inline" aria-hidden="true" focusable="false"><use href="#i-phone"></use></svg> Android app
+        </button>
+        <button type="button" role="tab" id="tab-windows" aria-controls="panel-windows" aria-selected="false" data-os="windows">
+          <svg width="15" height="15" class="ico-inline" aria-hidden="true" focusable="false"><use href="#i-monitor"></use></svg> Windows host (preview)
+        </button>
+        <button type="button" role="tab" id="tab-server" aria-controls="panel-server">
+          <svg width="15" height="15" class="ico-inline" aria-hidden="true" focusable="false"><use href="#i-server"></use></svg> Signaling broker
+        </button>
+      </div>
+
+      <!-- ---------------------------------------------------- Android -->
+      <div class="tabpanel prose" id="panel-android" role="tabpanel" aria-labelledby="tab-android" tabindex="0">
+        <div class="split">
+          <div>
+            <h2>Build the Android app</h2>
+            <p>Open <code>android/</code> in Android Studio (Koala or newer), or build from the command line.
+              You need the Android SDK for API 35 and a JDK — CI builds on 17, and 21 works locally. The
+              Gradle wrapper is committed, so there is nothing to bootstrap.</p>
+            <div class="code"><pre>git clone https://github.com/Vivek202509/remoteassist.git
+cd remoteassist/android
+./gradlew :app:assembleDebug          # APK in app/build/outputs/apk/debug/</pre></div>
+
+            <h3>Point it at your broker</h3>
+            <p>Pass the signaling URL on the build command line with <code>-PsignalingUrl</code>. The debug
+              default, <code>ws://10.0.2.2:8080</code>, is the emulator&rsquo;s alias for host loopback and is
+              <strong>not reachable from a physical handset</strong> — a phone built with the default will
+              never connect. Use your machine&rsquo;s LAN address, or a deployed <code>wss://</code>
+              endpoint.</p>
+            <div class="code"><pre>./gradlew :app:assembleDebug -PsignalingUrl=ws://192.168.1.43:8080
+
+# or, for a broker reachable over the internet
+./gradlew :app:assembleDebug -PsignalingUrl=wss://signal.example.com</pre></div>
+            <p class="note"><strong>Cleartext is handled for you.</strong> When <code>-PsignalingUrl</code>
+              names a <code>ws://</code> host, the debug build generates a network-security exception for that
+              one host. Release builds keep the platform default, so no shipped artifact carries a cleartext
+              exemption.</p>
+
+            <h3>Install on both devices</h3>
+            <div class="code"><pre>adb -s &lt;serial-of-host&gt; install -r app/build/outputs/apk/debug/app-debug.apk
+adb -s &lt;serial-of-controller&gt; install -r app/build/outputs/apk/debug/app-debug.apk</pre></div>
+
+            <h3>Permissions you will be asked for</h3>
+            <ul>
+              <li><strong>Screen capture</strong> — the system MediaProjection prompt, once per session.</li>
+              <li><strong>Accessibility service</strong> — only on the controlled device, so remote taps and
+                swipes can be injected. Android shows its own disclosure screen.</li>
+              <li><strong>Notifications</strong> — the session notification must be visible; it is how the
+                person being helped knows a session is live.</li>
+            </ul>
+            <p class="note"><strong>Two devices, please.</strong> Screen capture, input injection and NAT
+              traversal cannot be exercised meaningfully on a single emulator. The unit tests run anywhere;
+              the session itself needs hardware — and
+              <span data-status="notices.androidAcceptance">RemoteAssist has not yet been observed running
+              between two physical Android handsets. The code is complete and its unit tests pass; the device
+              acceptance matrix in the repository is still entirely open.</span></p>
+          </div>
+          <aside>
+            <div class="panel">
+              <div class="panel__head"><h3>Requirements</h3></div>
+              <div class="panel__body">
+                <dl>
+                  <div class="version-row"><dt>Android</dt><dd data-status="requirements.android">8.0 – 15 · API 26–35</dd></div>
+                  <div class="version-row"><dt>Compile SDK</dt><dd data-status="requirements.compileSdk">API 35</dd></div>
+                  <div class="version-row"><dt>JDK</dt><dd data-status="requirements.jdk">17 (CI) or 21</dd></div>
+                  <div class="version-row"><dt>Gradle</dt><dd data-status="requirements.gradle">8.9 (wrapper committed)</dd></div>
+                  <div class="version-row"><dt>Distribution</dt><dd data-status="distribution.android.label">Build from source</dd></div>
+                </dl>
+                <p class="dropdown__note" data-status="distribution.android.note">No signed APK is published.
+                  CI builds an unsigned debug APK as a workflow artifact; it is a development build, not a
+                  release.</p>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel__head"><h3>Optional: device wake</h3></div>
+              <div class="panel__body">
+                <p class="text-muted-sm">To wake an offline host, add
+                  <code>google-services.json</code> to <code>app/</code>, re-enable the Google Services plugin
+                  lines in both Gradle files, and set <code>FCM_ENABLED=true</code> on the broker. Without it
+                  everything else still works — only wake is inert.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- ---------------------------------------------------- Windows -->
+      <div class="tabpanel prose" id="panel-windows" role="tabpanel" aria-labelledby="tab-windows" tabindex="0" hidden>
+        <h2>Windows host <span class="badge badge--preview" data-status-badge="platforms.windowsHost">Preview</span></h2>
+        <p><strong>Source and developer build only — there is no Windows installer.</strong>
+          <span data-status="distribution.windows.note">There is no Windows installer. The host is built from
+          source with the .NET SDK and run from the build output.</span></p>
+        <p>The Windows side registers with the broker, pairs cryptographically, captures the desktop with
+          Desktop Duplication, encodes VP8 and accepts remote input.
+          <span data-status="notices.windowsPreview">The Windows host streams and accepts input, but no
+          Android controller has rendered its desktop and no session has crossed a network. Treat it as a
+          preview.</span></p>
+        <div class="code"><pre>cd windows
+dotnet restore
+dotnet build Techee.Windows.slnx -c Release
+dotnet test</pre></div>
+        <h3>What is built and tested</h3>
+        <ul>
+          <li>TPM-backed device identity, registering against the real broker rather than a mock.</li>
+          <li>Pairing crypto and trust stores (no real-device pairing run yet).</li>
+          <li>DXGI capture → BGRA → I420 → VP8 → WebRTC with DTLS-SRTP, between two in-process peers.</li>
+          <li><code>SendInput</code> injection with per-command authorisation and rate limiting, verified
+            against a real window receiving real <code>WM_*</code> messages.</li>
+          <li>Authenticated peer recreation instead of a true ICE restart (a SIPSorcery limitation).</li>
+        </ul>
+        <h3>Not built, or not yet proven</h3>
+        <ul>
+          <li>Controller UI — a Windows machine cannot yet drive another device.</li>
+          <li>Unattended host service, power control and scheduling.</li>
+          <li>No Android controller has rendered a Windows desktop.</li>
+          <li>TURN has not been exercised from Windows at all.</li>
+          <li>Display scaling above 100% and multi-monitor selection are unit-covered but untested on
+            hardware.</li>
+        </ul>
+        <p class="note"><strong>Before you rely on it:</strong> read
+          <a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/WINDOWS_ARCHITECTURE.md">WINDOWS_ARCHITECTURE.md</a>
+          and the <a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/W3_ACCEPTANCE_PROCEDURE.md">W3 acceptance procedure</a>.</p>
+      </div>
+
+      <!-- ---------------------------------------------------- Broker -->
+      <div class="tabpanel prose" id="panel-server" role="tabpanel" aria-labelledby="tab-server" tabindex="0" hidden>
+        <h2>Signaling broker</h2>
+        <p>A small Node.js WebSocket service: it registers devices by public-key id, brokers six-digit codes
+          and paired-direct dials, relays the WebRTC handshake, issues time-limited TURN credentials and
+          optionally sends a wake push. It never sees media.</p>
+        <div class="code"><pre>cd server
+npm install
+npm test        # protocol conformance + broker end-to-end checks
+npm start       # ws://0.0.0.0:8080</pre></div>
+        <p>That is <span data-status="checks.protocol">229</span> protocol conformance checks and
+          <span data-status="checks.broker">46</span> broker checks. They need no phone and no SDK, which is
+          why they are the part of RemoteAssist you can verify in a minute.</p>
+
+        <h3>Configuration</h3>
+        <p>Everything is environment-driven; copy <code>server/.env.example</code> and edit. On Node 20+ you
+          can load it directly:</p>
+        <div class="code"><pre>node --env-file=.env src/server.js</pre></div>
+        <div class="table-scroll">
+          <table class="matrix">
+            <caption>Broker environment variables, as read by <code>server/src/config.js</code>.</caption>
+            <thead><tr><th scope="col">Variable</th><th scope="col">Default</th><th scope="col">Purpose</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">PORT</th><td>8080</td><td>WebSocket listen port</td></tr>
+              <tr><th scope="row">TURN_HOST</th><td>localhost</td><td>coturn hostname handed to clients</td></tr>
+              <tr><th scope="row">TURN_SECRET</th><td><em>change me</em></td><td>Must equal <code>static-auth-secret</code> in coturn</td></tr>
+              <tr><th scope="row">TURN_TTL_SEC</th><td>3600</td><td>Lifetime of issued TURN credentials</td></tr>
+              <tr><th scope="row">SESSION_CODE_TTL_MS</th><td>300000</td><td>How long a six-digit code stays valid</td></tr>
+              <tr><th scope="row">REGISTER_CHALLENGE_TTL_MS</th><td>30000</td><td>Registration challenge window</td></tr>
+              <tr><th scope="row">FCM_ENABLED</th><td>false</td><td>Enable wake push (needs firebase-admin)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>TURN, for cross-network sessions</h3>
+        <p>Two phones on different carriers almost always need a relay, because CGNAT blocks direct
+          peer-to-peer. Deploy coturn on a host with a public IP:</p>
+        <div class="code"><pre>sudo apt install coturn
+sudo cp infra/turnserver.conf /etc/turnserver.conf
+# set external-ip, realm, static-auth-secret (= TURN_SECRET) and TLS certs
+sudo turnserver -c /etc/turnserver.conf -v</pre></div>
+        <p>Open UDP/TCP <strong>3478</strong> and <strong>5349</strong>, plus UDP
+          <strong>49152–65535</strong>. Verify with a WebRTC trickle-ICE test page before wiring the app.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--alt">
+  <div class="wrap">
+    <h2 class="section-title">Release history</h2>
+    <p class="section-sub">One version exists. There is no back catalogue to browse.</p>
+    <div class="table-scroll">
+      <table class="matrix">
+        <caption>Versions of the app and the broker, tracked together.</caption>
+        <thead><tr><th scope="col">Version</th><th scope="col">State</th><th scope="col">Contents</th></tr></thead>
+        <tbody>
+          <tr>
+            <th scope="row" data-status="version.label">1.0 (build 1)</th>
+            <td>Current, source only</td>
+            <td>Consent-first attended sessions · pairing with safety number · ICE-restart recovery ·
+              unattended grants · time-limited TURN credentials · Windows host preview. Never published as a
+              binary; commit history is the changelog.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Need the step-by-step?</h2>
+    <p>The documentation walks through the broker, TURN, pairing and your first session end to end.</p>
+    <a class="btn btn--white" href="document.html">Open the guide <span class="chev">›</span></a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h2 class="foot-title">RemoteAssist</h2>
+        <p>A consent-first, end-to-end-encrypted remote support and remote desktop system.</p>
+        <nav class="socials" aria-label="Project links">
+          <a href="https://github.com/Vivek202509/remoteassist"><span aria-hidden="true">gh</span><span class="visually-hidden">RemoteAssist source on GitHub</span></a>
+        </nav>
+      </div>
+      <div>
+        <h2 class="foot-title" data-i18n="foot.product">Product</h2>
+        <ul>
+          <li><a href="index.html#features">Features</a></li>
+          <li><a href="download.html">Download</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="index.html#security">Security</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="foot-title" data-i18n="foot.resources">Resources</h2>
+        <ul>
+          <li><a href="document.html">Documentation</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/PROTOCOL.md">Protocol spec</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="foot-title" data-i18n="foot.company">Company</h2>
+        <ul>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/issues">Report an issue</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/blob/main/LICENSE">Licence (MIT)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; <span data-year>2026</span> RemoteAssist contributors. MIT licence.</span>
+      <span>Built with WebRTC, Kotlin/Compose and Node.js.</span>
+    </div>
+  </div>
+</footer>
+
+<button class="to-top" type="button" aria-label="Back to top">↑</button>
+<script src="assets/js/product-status.js"></script>
+<script src="assets/js/site.js"></script>
+<script src="assets/js/i18n.js"></script>
+</body>
+</html>
