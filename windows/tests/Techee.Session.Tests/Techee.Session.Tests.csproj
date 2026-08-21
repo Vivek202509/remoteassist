@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="Xunit.SkippableFact" Version="1.5.61" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Shared rather than duplicated: the pump fakes are the same fakes, and a second
+         copy would drift from the pipeline they exist to exercise. -->
+    <Compile Include="..\Techee.Windows.Host.Tests\Fakes.cs" Link="Fakes.cs" />
+    <!-- The real Node broker, not a stand-in. A mock would be written from the same
+         reading of the protocol as the client, so both could agree on a misreading. -->
+    <Compile Include="..\Techee.Signaling.Tests\BrokerFixture.cs" Link="BrokerFixture.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Techee.Session\Techee.Session.csproj" />
+    <ProjectReference Include="..\..\src\Techee.Crypto\Techee.Crypto.csproj" />
+    <ProjectReference Include="..\..\src\Techee.Protocol\Techee.Protocol.csproj" />
+    <ProjectReference Include="..\..\src\Techee.WebRtc\Techee.WebRtc.csproj" />
+    <ProjectReference Include="..\..\src\Techee.Windows.Host\Techee.Windows.Host.csproj" />
+  </ItemGroup>
+
+</Project>
