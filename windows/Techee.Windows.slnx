@@ -6,6 +6,7 @@
     <Project Path="src/Techee.Signaling/Techee.Signaling.csproj" />
     <Project Path="src/Techee.Store/Techee.Store.csproj" />
     <Project Path="src/Techee.WebRtc/Techee.WebRtc.csproj" />
+    <Project Path="src/Techee.Windows.ControllerApp/Techee.Windows.ControllerApp.csproj" />
     <Project Path="src/Techee.Windows.Host/Techee.Windows.Host.csproj" />
     <Project Path="src/Techee.Windows.HostApp/Techee.Windows.HostApp.csproj" />
   </Folder>

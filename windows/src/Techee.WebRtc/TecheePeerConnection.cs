@@ -93,7 +93,7 @@ public sealed class TecheePeerConnection : IAsyncDisposable
     private MediaStreamTrack? _videoTrack;
 
     private long _videoBytes, _videoFrames;
-    private long _videoPacketsReceived, _videoBytesReceived;
+    private long _videoPacketsReceived, _videoBytesReceived, _videoFramesReceived;
     private bool _disposed;
 
     // Single-flight recovery. SIPSorcery reports disconnected and failed independently
@@ -243,15 +243,38 @@ public sealed class TecheePeerConnection : IAsyncDisposable
 
         pc.onconnectionstatechange += HandleConnectionStateChange;
 
-        // Inbound video, counted rather than decoded. This is the receiving end's only
-        // honest evidence that media actually crossed the link: the sender's own
-        // counters prove a frame was handed to the RTP stack, not that anything arrived.
+        // Inbound video, counted. This is the receiving end's only honest evidence that
+        // media actually crossed the link: the sender's own counters prove a frame was
+        // handed to the RTP stack, not that anything arrived.
         pc.OnRtpPacketReceived += (_, mediaType, packet) =>
         {
             if (mediaType != SDPMediaTypesEnum.video) return;
             Interlocked.Increment(ref _videoPacketsReceived);
             Interlocked.Add(ref _videoBytesReceived, packet?.Payload?.Length ?? 0);
             if (packet is not null) ObserveTimestamp(packet.Header.Timestamp);
+        };
+
+        // Reassembled frames, for a controller that wants to display one. Counting
+        // packets says bytes arrived; only a whole frame can be decoded, and until W5
+        // nothing on this side ever asked for one.
+        //
+        // Raised on SIPSorcery's receive thread, so a subscriber that blocks here stalls
+        // reception. The viewer hands off immediately and decodes elsewhere.
+        pc.OnVideoFrameReceived += (_, timestamp, frame, _) =>
+        {
+            if (frame is null || frame.Length == 0) return;
+            Interlocked.Increment(ref _videoFramesReceived);
+
+            try
+            {
+                VideoFrameReceived?.Invoke(frame, timestamp);
+            }
+            catch (Exception e)
+            {
+                // A broken subscriber must not take down the receive loop, and must not
+                // be able to make the link look failed when it is healthy.
+                _log?.Invoke($"[peer] video frame subscriber threw: {e.GetType().Name}");
+            }
         };
 
         pc.onicecandidate += candidate =>
@@ -392,14 +415,41 @@ public sealed class TecheePeerConnection : IAsyncDisposable
 
     /// <summary>Video RTP packets received from the peer.</summary>
     /// <remarks>
-    /// The receiving side's proof that media crossed the link. Counted rather than
-    /// decoded: this side does not render, and a packet count is enough to distinguish
-    /// "the sender thinks it sent" from "the receiver actually got it".
+    /// The receiving side's proof that media crossed the link. A packet count is what
+    /// distinguishes "the sender thinks it sent" from "the receiver actually got it",
+    /// and it is meaningful whether or not anything subscribes to
+    /// <see cref="VideoFrameReceived"/>.
     /// </remarks>
     public long VideoPacketsReceived => Interlocked.Read(ref _videoPacketsReceived);
 
     /// <summary>Payload bytes of received video RTP.</summary>
     public long VideoBytesReceived => Interlocked.Read(ref _videoBytesReceived);
+
+    /// <summary>Whole video frames reassembled from inbound RTP.</summary>
+    /// <remarks>
+    /// Counted independently of <see cref="VideoFrameReceived"/> so the number is
+    /// available to a headless peer that never subscribes. Compare it against
+    /// <see cref="VideoPacketsReceived"/> to tell "nothing arrived" from "packets
+    /// arrived but never assembled into a frame" — the latter is what a packetisation
+    /// disagreement looks like, and the two failures have nothing in common.
+    /// </remarks>
+    public long VideoFramesReceived => Interlocked.Read(ref _videoFramesReceived);
+
+    /// <summary>
+    /// Raised with each reassembled inbound video frame and its RTP timestamp.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The encoded frame, not pixels — decoding is the subscriber's business, because a
+    /// headless recorder wants the elementary stream and only a viewer wants a bitmap.
+    /// </para>
+    /// <para>
+    /// <b>Raised on the receive thread.</b> A subscriber that blocks here stalls
+    /// reception for every stream on this connection, so hand off and return. Exceptions
+    /// are caught and logged rather than allowed to escape into SIPSorcery's loop.
+    /// </para>
+    /// </remarks>
+    public event Action<byte[], uint>? VideoFrameReceived;
 
     /// <summary>Whether this peer has already asked to be replaced.</summary>
     /// <remarks>Lets the session layer and its tests assert the single-flight property.</remarks>
