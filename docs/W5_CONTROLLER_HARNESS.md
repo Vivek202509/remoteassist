@@ -76,12 +76,93 @@ carries no decodable video looks entirely healthy from the outside.
 
 ---
 
-## 3. Laptop-to-laptop procedure
+## 3. Single-machine smoke test — do this first
+
+Both apps run on one laptop. They keep separate CNG keys and separate stores precisely so
+they can, and it costs about two minutes.
+
+It is worth doing before involving a second machine because it eliminates most of what
+goes wrong: a wrong key seeded, a firewall, a mistyped device ID, a broker that is not
+listening. What remains after it passes is the genuinely two-machine part — the network.
+
+> **If your SDK is a user-local install** (`~/.dotnet`, which is how a machine without
+> admin rights gets one), set `DOTNET_ROOT` before running either binary:
+>
+> ```powershell
+> $env:DOTNET_ROOT = "$env:USERPROFILE\.dotnet"
+> ```
+>
+> The apphost checks PATH, `DOTNET_ROOT`, the registry, and `C:\Program Files\dotnet` —
+> a `~/.dotnet` install is none of them, so without this the executables fail with
+> "You must install .NET to run this application" on the machine that just built them.
+> `Techee-Lab.ps1` sets it for you.
+
+Three terminals, all in the repo root:
+
+```powershell
+# 1 — broker
+cd server; $env:PORT="8080"; node src/server.js
+
+# 2 — host
+$H = "windows\src\Techee.Windows.HostApp\bin\Release\net10.0\techee-host.exe"
+$C = "windows\src\Techee.Windows.ControllerApp\bin\Release\net10.0-windows\techee-ctl.exe"
+
+& $H identity                       # note the public key
+& $C identity                       # note the public key
+& $H trust --pub <C public key> --name "loopback controller" --control
+& $C trust --pub <H public key> --name "loopback host"
+& $H run --broker ws://127.0.0.1:8080
+
+# 3 — controller
+& $C connect --broker ws://127.0.0.1:8080 --host <H device id> --pair `
+     --record loopback.ivf --snapshot loopback.png
+```
+
+You should see your own desktop, recursively, in the viewer.
+
+**What this proves:** registration, pairing, SDP signing and verification, ICE, DTLS-SRTP,
+VP8 encode → RTP → depacketise → decode, the control channel, and grant enforcement.
+
+**What it does not prove:** anything about a network. Every candidate pair will be `host`,
+nothing crosses a NAT, and the loopback path hides MTU and packet-loss behaviour
+entirely. It is a smoke test, not row E1.
+
+---
+
+## 4. Laptop-to-laptop procedure
 
 Two Windows laptops, call them **H** (host) and **C** (controller). The broker runs on H
 here to keep it to two machines; a third machine works the same way.
 
-### 3.1 Build, on both
+> **`windows/scripts/Techee-Lab.ps1` automates all of §4.** It wraps exactly the commands
+> below — nothing more — so use it if you want the steps done for you, and read this
+> section if you want to know what it did.
+>
+> ```powershell
+> # H
+> .\Techee-Lab.ps1 -Role Host -Action build
+> .\Techee-Lab.ps1 -Role Host -Action broker           # opens the port, prints the URL
+> .\Techee-Lab.ps1 -Role Host -Action card             # -> host.peercard.json
+> .\Techee-Lab.ps1 -Role Host -Action trust -Card .\controller.peercard.json -Control
+> .\Techee-Lab.ps1 -Role Host -Action run
+>
+> # C
+> .\Techee-Lab.ps1 -Role Controller -Action build
+> .\Techee-Lab.ps1 -Role Controller -Action card       # -> controller.peercard.json
+> .\Techee-Lab.ps1 -Role Controller -Action trust -Card .\host.peercard.json
+> .\Techee-Lab.ps1 -Role Controller -Action run -Broker ws://<H-IP>:8080 -Pair
+> ```
+>
+> `-Action status` prints what is configured and what is missing, and every run explains
+> its exit code rather than leaving you to look it up.
+>
+> A **peer card** is a small JSON file holding one machine's device ID, public key and
+> short fingerprint. It exists so a base64 key can be copied as a file rather than
+> retyped. It carries no secret — a public key lets you verify and address a peer, never
+> impersonate it — and importing one still prints the TEST-SEEDED warning, because it is
+> a transport for a key and not a pairing exchange.
+
+### 4.1 Build, on both
 
 ```powershell
 dotnet build windows/Techee.Windows.slnx -c Release
@@ -90,7 +171,7 @@ dotnet build windows/Techee.Windows.slnx -c Release
 Binaries land in `windows/src/Techee.Windows.HostApp/bin/Release/net10.0/techee-host.exe`
 and `windows/src/Techee.Windows.ControllerApp/bin/Release/net10.0-windows/techee-ctl.exe`.
 
-### 3.2 Start the broker, on H
+### 4.2 Start the broker, on H
 
 ```powershell
 cd server
@@ -107,7 +188,7 @@ New-NetFirewallRule -DisplayName "techee-broker" -Direction Inbound -LocalPort 8
 
 Note H's LAN address (`ipconfig`). Everything below uses `ws://<H-IP>:8080`.
 
-### 3.3 Exchange identities
+### 4.3 Exchange identities
 
 On **H**:
 
@@ -142,7 +223,7 @@ Both will print the TEST-SEEDED warning. That is correct and it is not noise: th
 number on a seeded peer is meaningless, and the marker is written into the store so a
 seeded peer cannot later pass for a paired one.
 
-### 3.4 Run the host, on H
+### 4.4 Run the host, on H
 
 ```powershell
 techee-host run --broker ws://<H-IP>:8080
@@ -153,7 +234,7 @@ Wait for `host-open : OK` and `waiting for a controller`.
 > On a machine you are actually using, add `--no-input`. The controller can then watch but
 > not drive, which is the safe way to run the video half.
 
-### 3.5 Dial, on C
+### 4.5 Dial, on C
 
 First time only, register the pairing edge — the broker links both directions from one
 call, so the host does not need to do it too:
@@ -172,7 +253,7 @@ Connected | 1920x1080 | rx frames 412 (superseded 7) | pkts 5533 |
 Vp8Decoder(decoded=405, empty=7, failed=0) | rtt 3ms loss 0.0% | direct | dialect v1
 ```
 
-### 3.6 What to record
+### 4.6 What to record
 
 | Observation | Where to read it |
 |---|---|
@@ -194,7 +275,7 @@ That is the part of the evidence which does not depend on this codebase being ri
 
 ---
 
-## 4. Driving the rows
+## 5. Driving the rows
 
 ### D6 — Windows controller → Windows host
 
@@ -246,7 +327,7 @@ side can still offer a direct candidate and the pair will use it.
 
 ---
 
-## 5. Known limits
+## 6. Known limits
 
 - **Not a D4 substitute.** Stated at the top, restated here because it is the mistake this
   document exists to prevent.

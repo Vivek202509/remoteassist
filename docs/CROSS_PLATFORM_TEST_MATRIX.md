@@ -47,17 +47,19 @@ Status keys: **PASS** · **FAIL** · **NYT** (not yet tested) · **N/A** ·
 | A30 | Stuck-key and stuck-button protection | `dotnet test` | 10 | **PASS** — modifiers and buttons released on teardown, on recovery and on authorization loss; releases coalesced; nothing released when nothing was pressed |
 | A31 | Interop invariants — native `INPUT` size, wheel-delta overflow | `dotnet test` | 11 | **PASS** — includes a regression witness for the pre-audit arithmetic, which saturated a hostile `dx` of `1e300` to `int.MaxValue` (~17.9 M notches) |
 | A32 | **Real Windows application reacts to injected input** | `dotnet test` | 8 | **PASS**, opt-in — see A32 note below |
+| A33 | Controller coordinate mapping — letterbox, pillarbox, drag clamping, DPI independence | `dotnet test` | 21 | **PASS** |
+| A34 | IVF recording container — header layout, framing, RTP clock wrap | `dotnet test` | 11 | **PASS** |
 
-Windows solution total: **430 passed, 0 failed, 13 skipped** (11 of the skips are the
-opt-in and second-monitor real-hardware cases).
+Windows solution total: **498 passed, 0 failed, 13 skipped** on .NET SDK 10.0.400
+(11 of the skips are the opt-in and second-monitor real-hardware cases). Per-assembly:
+Protocol 34 · Store 22 · Crypto 42 (1 skipped) · Signaling 14 · WebRtc 59 (1 skipped) ·
+Windows.Host 136 (11 skipped) · Session 191.
 
-**Two suites added with the W5 controller harness are NOT in that total and have never
-been run:** `VideoGeometryTests` (controller coordinate mapping, incl. the §5.3 letterbox
-bug and D9's scale-independence) and `IvfWriterTests` (the acceptance recording's
-container). They were written on a machine with no .NET SDK, so they have not been
-compiled, let alone executed. Run `dotnet test` before quoting any number here — a written
-test is not a passing test, which is the same rule the rest of this document applies to
-builds and emulators.
+A33 is the one worth reading. A coordinate mapping that is wrong by a few percent still
+produces a session that connects, streams and reports every counter as healthy — it just
+puts the operator's clicks somewhere they did not aim. It covers the `PROTOCOL.md` §5.3
+letterbox bug from both directions, and the reject-on-press / clamp-on-drag distinction
+that stops a drag into the padding from stranding a held button on the host.
 
 **A32 runs only with `TECHEE_REAL_INPUT=1`** and was executed manually on the reference
 machine. It drives a purpose-built top-level window — an ordinary `HWND` with a real
@@ -189,7 +191,7 @@ record and what must **not** happen, are in
 | D3 | Android ↔ Windows pairing, matching safety numbers | W2 | **PARTIAL** — the safety number is proven identical across all three languages (B13) and both proof directions verify, but **no two real devices have paired**. That needs a phone and a PC, and remains manual |
 | D4 | Android controller sees Windows desktop | W3 | **NYT — device required.** No longer blocked: the frame pump, host session orchestration and reconnection are built, and the full chain DXGI→I420→VP8→WebRTC is proven in-process (A14–A18). What is missing is a real Android controller rendering the result — the receiving peer in every automated test is a second SIPSorcery instance, so both ends share an implementation and could share a misreading of VP8 packetisation. This is W3's outstanding exit criterion. See `WINDOWS_VIDEO_PIPELINE.md` |
 | D5 | Windows controller sees Android screen | W5 | **BLOCKED** |
-| D6 | Windows controller → Windows host | W5 | **NYT — device required.** No longer blocked: `techee-ctl` exists (`windows/src/Techee.Windows.ControllerApp`), registers, authenticates the host's offer, decodes VP8 and renders it, and sends the full v1 input vocabulary. What is missing is a run on two real machines. Procedure in [`W5_CONTROLLER_HARNESS.md`](W5_CONTROLLER_HARNESS.md). **Not a substitute for D4** — both ends are SIPSorcery and the same libvpx build, so they can share a misreading of VP8 packetisation |
+| D6 | Windows controller → Windows host | W5 | **NYT — device required. Loopback PASS.** `techee-ctl` exists and the whole chain runs: on one machine, a 25 s session carried **494 video packets / 351,768 bytes / 249 frames, of which the controller decoded 249 with 0 empty and 0 failed at 1280x720**, and the decoded PNG is the host's real desktop. Registration, pairing, SDP signing and verification, ICE, DTLS-SRTP and the control channel all exercised; exit 0. **That is loopback, not two machines** — every candidate pair was `host`, nothing crossed a NAT. The row still needs the two-laptop run in [`W5_CONTROLLER_HARNESS.md`](W5_CONTROLLER_HARNESS.md) §4. **Not a substitute for D4** either: both ends are SIPSorcery on the same libvpx build, so they can share a misreading of VP8 packetisation |
 | D7 | Mouse click / drag / wheel accuracy | W4 | **HOST PASS · controller acceptance NYT.** Click, right-click, coordinate mapping and drag are proven against a real window receiving real `WM_*` messages (A32), and authorization is proven over a real data channel (A28). Wheel is **still not exercised end to end**, but it is no longer unreachable: `pointer.wheel` has no v0 form so the shipped Android controller cannot send one, and `techee-ctl` now can. Needs a run on two machines |
 | D8 | Keyboard incl. modifiers and Unicode | W4 | **HOST PASS · controller acceptance NYT.** `techee w4 héllo` was typed into a real `EDIT` control, key down/up arrive distinctly, and the extended-key flag round-trips as VK_UP rather than VK_NUMPAD8 (A32); modifier ordering and the whole D8 key vocabulary are covered at the mapping layer (A24, A25). No longer unreachable — the shipped Android controller has no keyboard sender at all, and `techee-ctl` sends both key positions and `keyboard.text`. Needs a run on two machines |
 | D9 | DPI 100 / 125 / 150 % coordinate accuracy | W4 | **NYT — hardware required.** Mapping is proven monotonic and correctly positioned against a real window at **100% only** (A32); the arithmetic is unit-covered at every scale, but the reference machine has no scaled display, so 125% and 150% are untested on hardware |

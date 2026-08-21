@@ -7,6 +7,12 @@ using Techee.Signaling;
 using Techee.Store;
 using Techee.WebRtc;
 
+// System.Windows.Forms is an implicit using in a UseWindowsForms project, and it has its
+// own LinkState — for the states of a LinkLabel. Aliased rather than fully qualified at
+// each use so the collision is stated once, here, instead of being rediscovered by
+// whoever next adds a line that mentions the type.
+using LinkState = Techee.WebRtc.LinkState;
+
 namespace Techee.Windows.ControllerApp;
 
 /// <summary>Why a controller session ended.</summary>

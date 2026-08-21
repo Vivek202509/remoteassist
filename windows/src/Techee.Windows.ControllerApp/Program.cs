@@ -95,7 +95,7 @@ internal static class Program
                   --force-relay   Restrict ICE to relay candidates, so the session can
                                   only succeed through TURN. Both ends must set it for
                                   the result to mean anything.
-                  --store DIR     Default %LOCALAPPDATA%\\Techee\\controller, DPAPI-protected.
+                  --store DIR     Default %LOCALAPPDATA%\Techee\controller, DPAPI-protected.
                   --key NAME      CNG key name. Default Techee.ControllerIdentity.
 
             Exit codes: 0 clean · 1 no verb · 2 bad arguments · 3 registration failed
