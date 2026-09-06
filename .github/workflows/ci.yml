@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   server:
-    name: Signaling server (smoke test)
+    name: Signaling server (protocol + smoke tests)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,8 +26,48 @@ jobs:
           cache: npm
           cache-dependency-path: server/package-lock.json
       - run: npm ci
-      - name: Protocol smoke test
+
+      # Runs first: it is pure and fast, and a contract break here explains any
+      # broker failure that follows. Reads protocol/fixtures/ from the repo root,
+      # which is why this job needs the full checkout rather than just server/.
+      - name: Protocol conformance (cross-language fixtures)
+        run: npm run protocol
+
+      - name: Broker end-to-end smoke test
         run: npm run smoke
+
+  windows:
+    name: Windows (.NET build + tests)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # The signaling integration tests spawn the real broker as a child process
+      # rather than mocking it. A mock would be written from the same understanding
+      # as the client, so the two would agree on a misreading of the protocol.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install broker dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Build
+        working-directory: windows
+        run: dotnet build --configuration Release
+
+      # Runs the cross-language protocol/crypto conformance suites plus the
+      # end-to-end registration tests against the real Node broker.
+      - name: Test
+        working-directory: windows
+        run: dotnet test --configuration Release --no-build --logger "console;verbosity=normal"
 
   android:
     name: Android (build + unit tests + lint)

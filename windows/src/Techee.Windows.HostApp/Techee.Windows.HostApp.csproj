@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!--
+      Windows-only by nature: this host drives Desktop Duplication, SendInput, CNG and
+      DPAPI, every one of them a type marked [SupportedOSPlatform("windows")]. Declaring
+      a platform-neutral TFM made all 15 of those call sites "reachable on all platforms"
+      to the analyser (CA1416). The sibling ControllerApp already targets net10.0-windows;
+      this states the same truth rather than suppressing the warning that noticed it.
+    -->
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>techee-host</AssemblyName>
+    <RootNamespace>Techee.Windows.HostApp</RootNamespace>
+  </PropertyGroup>
+
+  <!-- The runnable Windows host. Exists so W3's acceptance criteria — an Android
+       controller rendering this desktop, and a session forced through TURN — can
+       actually be executed. Until this project existed every Windows assembly was a
+       library and there was nothing to launch. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Techee.Crypto\Techee.Crypto.csproj" />
+    <ProjectReference Include="..\Techee.Protocol\Techee.Protocol.csproj" />
+    <ProjectReference Include="..\Techee.Session\Techee.Session.csproj" />
+    <ProjectReference Include="..\Techee.Signaling\Techee.Signaling.csproj" />
+    <ProjectReference Include="..\Techee.Store\Techee.Store.csproj" />
+    <ProjectReference Include="..\Techee.WebRtc\Techee.WebRtc.csproj" />
+    <ProjectReference Include="..\Techee.Windows.Host\Techee.Windows.Host.csproj" />
+  </ItemGroup>
+
+</Project>

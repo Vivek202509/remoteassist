@@ -17,6 +17,10 @@ module.exports = {
   sessionCodeTtlMs: parseInt(process.env.SESSION_CODE_TTL_MS || '300000', 10), // 5 min
   pendingWakeTtlMs: parseInt(process.env.PENDING_WAKE_TTL_MS || '60000', 10),  // 1 min
 
+  // How long a registration challenge stays valid. Short by design: it only has
+  // to survive one network round trip plus a Keystore signature.
+  registerChallengeTtlMs: parseInt(process.env.REGISTER_CHALLENGE_TTL_MS || '30000', 10),
+
   // FCM: only used if firebase-admin is installed AND credentials are present.
   fcmEnabled: process.env.FCM_ENABLED === 'true',
 };

@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+
+    <!--
+      xUnit2000 wants the compile-time constant as the 'expected' argument. Here that
+      is backwards: the fixture file is the specification and the C# constant is the
+      thing under test, so `Assert.Equal(fixtureValue, TecheeProtocol.Constant)` reads
+      correctly and produces the right failure message ("expected 65536 from the
+      fixture, got 32768 in code"). Swapping to satisfy the analyser would invert the
+      meaning of every failure in this file.
+    -->
+    <NoWarn>$(NoWarn);xUnit2000</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Techee.Protocol\Techee.Protocol.csproj" />
+  </ItemGroup>
+
+</Project>

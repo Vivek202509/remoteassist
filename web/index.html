@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RemoteAssist — The consent-first, end-to-end-encrypted remote desktop</title>
+<meta name="description" content="RemoteAssist is a consent-first, end-to-end-encrypted remote support and remote desktop system. WebRTC transport, cryptographic device pairing, unattended access and a broker you host yourself.">
+<meta property="og:site_name" content="RemoteAssist">
+<meta property="og:type" content="website">
+<meta property="og:title" content="RemoteAssist — The consent-first, end-to-end-encrypted remote desktop">
+<meta property="og:description" content="RemoteAssist is a consent-first, end-to-end-encrypted remote support and remote desktop system. WebRTC transport, cryptographic device pairing, unattended access and a broker you host yourself.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/site.css">
+<script>try{var s=localStorage.getItem('ra-theme');document.documentElement.setAttribute('data-theme',s||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));}catch(e){}</script>
+</head>
+<body>
+
+<!-- icon sprite: stroke-style line icons, inherits colour from CSS -->
+<svg width="0" height="0" class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3l7.5 3v6c0 4.6-3.2 8.2-7.5 9.3C7.7 20.2 4.5 16.6 4.5 12V6L12 3z"/><polyline points="9 12 11 14 15 9.7"/>
+  </symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><path d="M12 14.5v3"/>
+  </symbol>
+  <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="7.5" cy="15.5" r="4"/><path d="M10.4 12.6L20 3"/><path d="M16.5 6.5l2.5 2.5"/>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/>
+  </symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.7h3"/>
+  </symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2.5" y="4" width="19" height="12.5" rx="2"/><path d="M12 16.5V20"/><path d="M8 20h8"/>
+  </symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="9" cy="8" r="3.5"/><path d="M2.8 20a6.2 6.2 0 0 1 12.4 0"/><path d="M16.2 5.4a3.5 3.5 0 0 1 0 5.2"/><path d="M17.6 14.4A6.2 6.2 0 0 1 21.2 20"/>
+  </symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/><polyline points="20.5 3.5 20.5 8.5 15.5 8.5"/>
+  </symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="13 2 5.5 13.5 11 13.5 10 22 18.5 10 13 10"/>
+  </symbol>
+  <symbol id="i-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4" width="18" height="6" rx="1.6"/><rect x="3" y="14" width="18" height="6" rx="1.6"/><path d="M7 7h.01"/><path d="M7 17h.01"/>
+  </symbol>
+  <symbol id="i-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 3l18 18"/><path d="M10.6 5.3A9.6 9.6 0 0 1 12 5.2c5 0 9 4.9 9 6.8 0 .8-.7 2.1-1.9 3.4"/><path d="M6.6 7.7C4.4 9.2 3 11.2 3 12c0 1.9 4 6.8 9 6.8 1.4 0 2.7-.4 3.8-1"/>
+  </symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><polyline points="12 6.8 12 12.4 16 14.4"/>
+  </symbol>
+  <symbol id="i-touch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 11.5V6.2a2.1 2.1 0 0 1 4.2 0v6"/><path d="M13.2 12.4v-1.6a2 2 0 0 1 4 0V16a5.5 5.5 0 0 1-5.5 5.5h-.4A5.3 5.3 0 0 1 6 16.2v-2.4"/>
+  </symbol>
+  <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14 3 14 8 19 8"/>
+  </symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3.5v11"/><polyline points="7.5 10.5 12 15 16.5 10.5"/><path d="M4 20h16"/>
+  </symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/>
+  </symbol>
+</svg>
+
+<!-- ============================== utility bar ============================== -->
+<div class="topbar">
+  <div class="wrap">
+    <div class="dropdown">
+      <button class="dropdown__toggle" type="button" aria-expanded="false" aria-controls="accounts-note">
+        <span data-i18n="top.accounts">Accounts</span> <span aria-hidden="true">&#9662;</span>
+      </button>
+      <div class="dropdown__menu" id="accounts-note">
+        <p class="dropdown__lead">Sign-in is not available</p>
+        <p class="dropdown__note" data-status="notices.accounts">There is no account system. Devices authenticate with their own hardware-backed keys, so there is nothing to sign in to.</p>
+      </div>
+    </div>
+    <nav class="socials" aria-label="Project links">
+      <a href="https://github.com/Vivek202509/remoteassist"><span aria-hidden="true">gh</span><span class="visually-hidden">RemoteAssist source on GitHub</span></a>
+    </nav>
+    <button class="theme-toggle" type="button" aria-pressed="false">
+      <span class="theme-toggle__icon" aria-hidden="true">&#9686;</span>
+      <span data-i18n="top.darkmode">Dark mode</span>
+    </button>
+    <div class="lang">
+      <label for="lang-select" data-i18n="top.language">Language:</label>
+      <select id="lang-select">
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ================================ header ================================ -->
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <img class="brand__mark" src="assets/img/logo.svg" alt="" width="52" height="52">
+      <span>
+        <span class="brand__word"><b>REMOTE</b><span>ASSIST</span></span>
+        <span class="brand__tag">Consent-first remote control</span>
+      </span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Menu"><span></span></button>
+    <nav class="nav" id="primary-nav" aria-label="Main">
+      <ul>
+        <li><a href="#features" data-i18n="nav.what">What&rsquo;s RemoteAssist?</a></li>
+        <li><a href="download.html" data-i18n="nav.download">Download</a></li>
+        <li><a href="document.html" data-i18n="nav.document">Document</a></li>
+        <li><a href="pricing.html" data-i18n="nav.pricing">Pricing</a></li>
+        <li><a href="blog.html" data-i18n="nav.blog">Blog</a></li>
+        <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- ============================== hero slider ============================= -->
+<section class="hero" data-slider tabindex="0" aria-roledescription="carousel"
+         aria-label="Product highlights" aria-describedby="hero-help">
+  <p class="visually-hidden" id="hero-help">Three slides. Use the left and right arrow keys, or the
+    previous and next buttons, to change slide.</p>
+  <div class="slide slide--a is-active" role="group" aria-roledescription="slide" aria-label="1 of 3">
+    <div class="slide__inner">
+      <p class="slide__kicker">Version <span data-status="version.name">1.0</span></p>
+      <h1 class="slide__title">End-to-end encrypted remote control</h1>
+      <p class="slide__lead">Media is peer-to-peer WebRTC — the broker relays the handshake and never sees a frame.</p>
+      <div class="slide__actions">
+        <a class="btn btn--white" href="#platforms"><span data-i18n="btn.status">What is built</span> <span class="chev">›</span></a>
+        <a class="btn btn--green" href="download.html"><span data-i18n="btn.download">Download</span> <span class="chev">›</span></a>
+      </div>
+    </div>
+  </div>
+  <div class="slide slide--b" role="group" aria-roledescription="slide" aria-label="2 of 3">
+    <div class="slide__inner">
+      <p class="slide__kicker">Unattended access</p>
+      <p class="slide__title">Reach a device nobody is holding</p>
+      <p class="slide__lead">Scoped, expiring, revocable grants — tied to a paired identity, never a raw device id.</p>
+      <div class="slide__actions">
+        <a class="btn btn--white" href="document.html#unattended">How it works <span class="chev">›</span></a>
+        <a class="btn btn--green" href="download.html">Download <span class="chev">›</span></a>
+      </div>
+    </div>
+  </div>
+  <div class="slide slide--c" role="group" aria-roledescription="slide" aria-label="3 of 3">
+    <div class="slide__inner">
+      <p class="slide__kicker">Designed for real networks</p>
+      <p class="slide__title">Wi-Fi to mobile data, no black screen</p>
+      <p class="slide__lead">An ICE restart reuses the same connection, so the video track and the consent
+        survive. Implemented and unit-tested; not yet timed against a real network switch.</p>
+      <div class="slide__actions">
+        <a class="btn btn--white" href="#security">Security model <span class="chev">›</span></a>
+        <a class="btn btn--green" href="download.html">Download <span class="chev">›</span></a>
+      </div>
+    </div>
+  </div>
+  <button class="slider-btn slider-btn--prev" type="button" data-slide-prev aria-label="Previous slide">‹</button>
+  <button class="slider-btn slider-btn--next" type="button" data-slide-next aria-label="Next slide">›</button>
+  <div class="slider-dots" role="group" aria-label="Choose a slide"></div>
+</section>
+
+<!-- =============================== trust strip =========================== -->
+<div class="strip">
+  <div class="wrap">
+    <span class="strip__item"><svg aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> Consent required on every attended session</span>
+    <span class="strip__item"><svg aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> DTLS-SRTP end-to-end encryption</span>
+    <span class="strip__item"><svg aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> Self-hosted broker &amp; TURN</span>
+    <span class="strip__item"><svg aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> MIT licensed, auditable source</span>
+  </div>
+</div>
+
+<!-- =========================== features + version ======================== -->
+<section class="section" id="features">
+  <div class="wrap split">
+    <div>
+      <h2 class="section-title" data-i18n="sec.features">Remote support so easy</h2>
+      <p class="section-sub">Remote control to support your clients and colleagues from anywhere — with the
+        controlled device always in charge of what happens.</p>
+
+      <div class="cards">
+        <article class="card">
+          <span class="card__icon"><svg aria-hidden="true" focusable="false"><use href="#i-touch"></use></svg></span>
+          <div>
+            <h3>Safe remote control</h3>
+            <p>Nothing starts without a tap on the controlled device. A persistent notification stays up for
+              the whole session, and either side can end it instantly.</p>
+          </div>
+        </article>
+        <article class="card">
+          <span class="card__icon"><svg aria-hidden="true" focusable="false"><use href="#i-users"></use></svg></span>
+          <div>
+            <h3>Works both ways</h3>
+            <p>Every install ships both roles. Whichever device opens the session is the one being
+              controlled — so the same app supports you and your partner.</p>
+          </div>
+        </article>
+        <article class="card">
+          <span class="card__icon"><svg aria-hidden="true" focusable="false"><use href="#i-key"></use></svg></span>
+          <div>
+            <h3>Cryptographic pairing</h3>
+            <p>Authenticated ECDH plus a short safety number you compare out loud once. Trust is stored
+              encrypted on both devices, keyed to a hardware-backed P-256 identity.</p>
+          </div>
+        </article>
+        <article class="card">
+          <span class="card__icon"><svg aria-hidden="true" focusable="false"><use href="#i-shield"></use></svg></span>
+          <div>
+            <h3>MITM-proof media</h3>
+            <p>Each peer signs its DTLS fingerprint with its identity key and verifies the other&rsquo;s. A
+              compromised signaling server still cannot insert itself into the stream.</p>
+          </div>
+        </article>
+        <article class="card">
+          <span class="card__icon"><svg aria-hidden="true" focusable="false"><use href="#i-clock"></use></svg></span>
+          <div>
+            <h3>Unattended access</h3>
+            <p>Owner-configured grants that are scoped, expiring and revocable, referencing a paired identity.
+              Android caps how far this can go, and the <a href="document.html#unattended">documentation says
+              exactly where the ceiling is</a>.</p>
+          </div>
+        </article>
+        <article class="card">
+          <span class="card__icon"><svg aria-hidden="true" focusable="false"><use href="#i-refresh"></use></svg></span>
+          <div>
+            <h3>Survives network switches</h3>
+            <p>Wi-Fi to cellular triggers an ICE restart on the same peer connection: no black screen, no
+              second consent prompt, exponential backoff if the path is slow to return.</p>
+          </div>
+        </article>
+        <article class="card">
+          <span class="card__icon"><svg aria-hidden="true" focusable="false"><use href="#i-bolt"></use></svg></span>
+          <div>
+            <h3>Wake a sleeping device</h3>
+            <p>Dialling an offline host sends a high-priority data-only push; the join request is queued and
+              delivered the moment that device reconnects. Needs your own Firebase project — it is off by
+              default and everything else works without it.</p>
+          </div>
+        </article>
+        <article class="card">
+          <span class="card__icon"><svg aria-hidden="true" focusable="false"><use href="#i-server"></use></svg></span>
+          <div>
+            <h3>Your broker, your rules</h3>
+            <p>Run the Node.js signaling broker and coturn yourself. It brokers codes and relays the
+              handshake — it never sees a frame of your screen.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <aside>
+      <div class="panel">
+        <div class="panel__head"><h3 data-i18n="sec.version">Latest version</h3></div>
+        <div class="panel__body">
+          <dl>
+            <div class="version-row"><dt>Release</dt><dd data-status="version.label">1.0 (build 1)</dd></div>
+            <div class="version-row"><dt>Distribution</dt><dd data-status="distribution.android.label">Build from source</dd></div>
+            <div class="version-row"><dt>Android</dt><dd data-status="requirements.android">8.0 – 15 · API 26–35</dd></div>
+            <div class="version-row"><dt>Transport</dt><dd data-status="requirements.transport">WebRTC DTLS-SRTP</dd></div>
+            <div class="version-row"><dt>Broker</dt><dd data-status="requirements.node">Node.js 18+</dd></div>
+            <div class="version-row"><dt>Licence</dt><dd data-status="requirements.licence">MIT</dd></div>
+          </dl>
+          <h4 class="panel__subhead">In this release</h4>
+          <ul class="changelog">
+            <li>Consent-first attended sessions with foreground-service notification</li>
+            <li>Pairing with out-of-band safety number</li>
+            <li>ICE-restart recovery across network changes</li>
+            <li>Scoped, expiring unattended grants</li>
+            <li>Time-limited TURN credentials from the broker</li>
+            <li>Windows host preview: capture, VP8 encode, remote input</li>
+          </ul>
+          <p class="dropdown__note" data-status="distribution.android.note">No signed APK is published. CI builds
+            an unsigned debug APK as a workflow artifact; it is a development build, not a release.</p>
+          <a class="btn btn--green btn--sm mt-sm" href="download.html">
+            <svg width="15" height="15" class="ico-inline" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg>
+            Build instructions
+          </a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><h3>Platform support</h3></div>
+        <div class="panel__body">
+          <dl>
+            <div class="version-row"><dt><svg width="16" height="16" class="ico-inline" aria-hidden="true" focusable="false"><use href="#i-phone"></use></svg> <span data-status="platforms.android.label">Android 8–15</span></dt><dd><span class="badge badge--ok" data-status-badge="platforms.android">Implemented</span></dd></div>
+            <div class="version-row"><dt><svg width="16" height="16" class="ico-inline" aria-hidden="true" focusable="false"><use href="#i-monitor"></use></svg> <span data-status="platforms.windowsHost.label">Windows 10/11 host</span></dt><dd><span class="badge badge--preview" data-status-badge="platforms.windowsHost">Preview</span></dd></div>
+            <div class="version-row"><dt><svg width="16" height="16" class="ico-inline" aria-hidden="true" focusable="false"><use href="#i-monitor"></use></svg> <span data-status="platforms.windowsController.label">Windows controller</span></dt><dd><span class="badge badge--soon" data-status-badge="platforms.windowsController">Planned</span></dd></div>
+            <div class="version-row"><dt><svg width="16" height="16" class="ico-inline" aria-hidden="true" focusable="false"><use href="#i-globe"></use></svg> <span data-status="platforms.otherPlatforms.label">iOS / macOS / Linux</span></dt><dd><span class="badge badge--soon" data-status-badge="platforms.otherPlatforms">Not built</span></dd></div>
+          </dl>
+          <p class="dropdown__note mt-sm" data-status="notices.androidAcceptance">RemoteAssist has
+            not yet been observed running between two physical Android handsets. The code is complete and its unit
+            tests pass; the device acceptance matrix in the repository is still entirely open.</p>
+          <p class="dropdown__note"><a href="#platforms">Read the full status table</a>.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================== how it works =========================== -->
+<section class="section section--alt" id="how">
+  <div class="wrap">
+    <div class="center">
+      <p class="eyebrow">Four steps</p>
+      <h2 class="section-title" data-i18n="sec.how">How a session works</h2>
+      <p class="section-sub">No account, no cloud dashboard, no port forwarding.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <h3>Install</h3>
+        <p>Put the app on both devices and point them at your broker URL — the same build acts as host or
+          controller.</p>
+      </div>
+      <div class="step">
+        <h3>Pair once</h3>
+        <p>Compare the safety number the two devices show. From then on each side knows the other&rsquo;s
+          public key.</p>
+      </div>
+      <div class="step">
+        <h3>Share the screen</h3>
+        <p>The host taps <em>Share my screen</em> and reads out the six-digit code, valid for five minutes.</p>
+      </div>
+      <div class="step">
+        <h3>Control</h3>
+        <p>The controller enters the code, the host allows it, and taps and swipes travel over the encrypted
+          data channel.</p>
+      </div>
+    </div>
+    <div class="code mt-lg">
+<pre>Host  &quot;Share my screen&quot;  ──host-open──▶  broker  ──▶  6-digit code
+Controller enters code   ──join──────▶  broker  ──join-request──▶  Host
+Host: consent dialog ▸ Allow  ▸  screen capture starts (notification stays up)
+Host ──offer(+signed DTLS fingerprint)──▶ broker ──▶ Controller ──answer──▶ Host
+ICE via STUN / coturn  ──▶  peer-to-peer or relayed, DTLS-SRTP end to end
+Controller taps ──DataChannel──▶ Host input service ──▶ gesture injected</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ================================ security ============================= -->
+<section class="section" id="security">
+  <div class="wrap">
+    <div class="center">
+      <p class="eyebrow">Security model</p>
+      <h2 class="section-title" data-i18n="sec.security">Designed to be verifiable</h2>
+      <p class="section-sub">Each guarantee below maps to code you can read, not a promise on a marketing page.</p>
+    </div>
+    <div class="sec-grid">
+      <div class="sec-item">
+        <h3>Hardware-backed identity</h3>
+        <p>Every device generates a P-256 keypair inside the platform keystore. The public key <em>is</em> the
+          device id, so identity cannot be spoofed by renaming a device.</p>
+      </div>
+      <div class="sec-item">
+        <h3>Verified pairing</h3>
+        <p>Authenticated ECDH plus mutual identity proofs, confirmed by a safety number compared out of band.
+          Trust is persisted in encrypted storage.</p>
+      </div>
+      <div class="sec-item">
+        <h3>Per-session authorisation</h3>
+        <p>The dialling side signs a fresh challenge for every session. Only an already-trusted identity is
+          accepted — a stolen device id is not enough.</p>
+      </div>
+      <div class="sec-item">
+        <h3>Signed media fingerprints</h3>
+        <p>DTLS fingerprints are signed with the identity key and verified against the paired public key, so a
+          hostile broker cannot become a silent middlebox.</p>
+      </div>
+      <div class="sec-item">
+        <h3>Visible, revocable consent</h3>
+        <p>Attended sessions need an explicit tap and the system capture prompt. Unattended grants are scoped,
+          expiring and revocable at any time from the device.</p>
+      </div>
+      <div class="sec-item">
+        <h3>The broker sees no media</h3>
+        <p>Signaling carries only setup metadata. Where TURN is needed, the relay forwards packets it has no
+          key to read.</p>
+      </div>
+    </div>
+    <p class="note mt-md"><strong>Read the details:</strong>
+      <a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/SECURITY_THREAT_MODEL.md">threat model</a>,
+      <a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/PROTOCOL.md">protocol specification</a> and
+      <a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/ARCHITECTURE.md">architecture notes</a>
+      are in the repository.</p>
+  </div>
+</section>
+
+<!-- =============================== platforms ============================= -->
+<section class="section section--alt" id="platforms">
+  <div class="wrap">
+    <div class="center">
+      <p class="eyebrow">Honest status</p>
+      <h2 class="section-title" data-i18n="sec.platforms">What is built, per platform</h2>
+      <p class="section-sub">The Android app is feature-complete and its unit tests pass. The Windows host
+        streams and accepts input between two in-process peers. Neither has been observed working between
+        two physical devices, and this table says so rather than rounding up.</p>
+    </div>
+    <div class="table-scroll">
+      <table class="matrix">
+        <caption>Legend: <strong>Verified</strong> = proven by a test that runs anywhere &middot;
+          <strong>Implemented</strong> = code complete and unit-tested, no hardware acceptance &middot;
+          <strong>Preview</strong> = built, but a required acceptance step has not been performed &middot;
+          <strong>Planned</strong> = not built.</caption>
+        <thead>
+          <tr><th scope="col">Capability</th><th scope="col">Android</th><th scope="col">Windows</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Protocol &amp; capability schema</th><td><span class="badge badge--ok">Verified</span></td><td><span class="badge badge--ok">Verified</span></td></tr>
+          <tr><th scope="row">Device identity &amp; registration</th><td><span class="badge badge--ok">Implemented</span></td><td><span class="badge badge--ok">Verified &middot; TPM-backed</span></td></tr>
+          <tr><th scope="row">Pairing, trust &amp; grants</th><td><span class="badge badge--ok">Implemented</span></td><td><span class="badge badge--preview">Crypto verified, no device pairing yet</span></td></tr>
+          <tr><th scope="row">Screen capture &amp; streaming</th><td><span class="badge badge--ok">Implemented</span></td><td><span class="badge badge--preview">DXGI + VP8, unproven on a phone</span></td></tr>
+          <tr><th scope="row">Reconnection</th><td><span class="badge badge--ok">Implemented &middot; ICE restart</span></td><td><span class="badge badge--preview">Authenticated peer recreation</span></td></tr>
+          <tr><th scope="row">Remote input</th><td><span class="badge badge--ok">Implemented</span></td><td><span class="badge badge--preview">SendInput, rate limited</span></td></tr>
+          <tr><th scope="row">Controller UI</th><td><span class="badge badge--ok">Implemented</span></td><td><span class="badge badge--soon">Planned</span></td></tr>
+          <tr><th scope="row">Unattended host service</th><td><span class="badge badge--preview">Scaffold — see the platform ceiling below</span></td><td><span class="badge badge--soon">Planned</span></td></tr>
+          <tr><th scope="row">Power control &amp; scheduling</th><td>—</td><td><span class="badge badge--soon">Planned</span></td></tr>
+          <tr><th scope="row">Session between two physical devices</th><td><span class="badge badge--soon">Not yet recorded</span></td><td><span class="badge badge--soon">Not yet recorded</span></td></tr>
+          <tr><th scope="row">Session across separate networks (TURN)</th><td><span class="badge badge--soon">Not yet recorded</span></td><td><span class="badge badge--soon">Not exercised</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note mt-md"><strong>Not yet Internet-ready remote control.</strong>
+      <span data-status="notices.turn">TURN has not been exercised from Windows, and no cross-network session
+      has been recorded on any platform. RemoteAssist is not yet demonstrated as Internet-ready remote
+      control.</span> The evidence log is public:
+      <a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/CROSS_PLATFORM_TEST_MATRIX.md">cross-platform test matrix</a>
+      and <a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/GALAXY_A03_REAL_DEVICE_TEST_MATRIX.md">real-device matrix</a>.</p>
+  </div>
+</section>
+
+<!-- ================================ pricing ============================== -->
+<section class="section" id="pricing">
+  <div class="wrap">
+    <div class="center">
+      <p class="eyebrow">Cost</p>
+      <h2 class="section-title" data-i18n="sec.pricing">Free to self-host</h2>
+      <p class="section-sub">The software is MIT licensed. Nothing else is on sale yet.</p>
+    </div>
+    <div class="plans plans--two">
+      <div class="plan">
+        <div class="plan__head">
+          <h3>Self-hosted</h3>
+          <div class="plan__price">Free<small>MIT licence</small></div>
+        </div>
+        <ul>
+          <li>Unlimited devices and sessions</li>
+          <li>Both roles in every install</li>
+          <li>Unattended grants</li>
+          <li>Your own broker and coturn</li>
+          <li>Full source, no telemetry</li>
+        </ul>
+        <div class="plan__foot"><a class="btn btn--ghost" href="download.html">Build it</a></div>
+      </div>
+      <div class="plan plan--unpriced">
+        <div class="plan__head">
+          <h3>Managed service</h3>
+          <div class="plan__price plan__price--tbd">Pricing coming soon<small>not commercially released</small></div>
+        </div>
+        <ul>
+          <li class="is-off">Managed broker and relay capacity</li>
+          <li class="is-off">Device groups and address book</li>
+          <li class="is-off">Session audit log</li>
+          <li class="is-off">Support commitment</li>
+        </ul>
+        <div class="plan__foot"><a class="btn btn--ghost" href="pricing.html">What this means</a></div>
+      </div>
+    </div>
+    <p class="note mt-md"><strong>No prices are published.</strong>
+      <span data-status="notices.pricing">RemoteAssist has not been commercially released and no prices have
+      been set. The self-hosted software is MIT licensed and free.</span></p>
+  </div>
+</section>
+
+<!-- ================================== FAQ ================================ -->
+<section class="section section--alt">
+  <div class="wrap">
+    <div class="center">
+      <p class="eyebrow">Questions</p>
+      <h2 class="section-title" data-i18n="sec.faq">Frequently asked</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>Does my screen go through your servers?</summary>
+        <div>No. Media is peer-to-peer WebRTC, encrypted with DTLS-SRTP. The signaling broker relays only
+          connection-setup metadata. If the two networks cannot reach each other directly, a TURN relay
+          forwards encrypted packets it cannot decrypt.</div>
+      </details>
+      <details>
+        <summary>Do I have to install something on the controlled device?</summary>
+        <div>Yes — the same app, which contains both roles. Screen capture and input injection require
+          platform permissions that a web page cannot obtain.</div>
+      </details>
+      <details>
+        <summary>Can I run it with no servers of my own?</summary>
+        <div>Not today. You need the signaling broker running somewhere both devices can reach, and coturn is
+          strongly recommended because carrier CGNAT usually blocks direct peer-to-peer. Both are in the
+          repository with configuration files.</div>
+      </details>
+      <details>
+        <summary>Is unattended access truly unattended on Android?</summary>
+        <div>Partly. Android 11+ makes a capture permission grant effectively single-use, and Android 14+
+          tightens re-acquisition further. A production unattended build must keep the capturer alive across
+          sessions rather than replaying a stored grant. That is a platform ceiling, and we document it rather
+          than paper over it.</div>
+      </details>
+      <details>
+        <summary>Is there an iPhone version?</summary>
+        <div>No. iOS does not expose the APIs needed to inject input into another app, so a controlled iOS
+          device is not possible outside of Apple&rsquo;s own frameworks.</div>
+      </details>
+      <details>
+        <summary>Is it really free?</summary>
+        <div>The source is MIT licensed — use it commercially, fork it, audit it. Nothing is for sale today:
+          there is no paid tier, no trial and no price list.</div>
+      </details>
+      <details>
+        <summary>Can I use it in production?</summary>
+        <div>Not yet, and the site will say so until that changes. The code is complete on Android and its
+          automated tests pass, but no session has been observed between two physical devices and no session
+          has crossed a network through TURN. Until those are recorded in the
+          <a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/CROSS_PLATFORM_TEST_MATRIX.md">test
+          matrix</a>, treat RemoteAssist as something to build, read and evaluate.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================================== CTA ================================ -->
+<section class="cta">
+  <div class="wrap">
+    <h2>Ready to connect two devices?</h2>
+    <p>Start the broker, build the app for both handsets, pair once. Every step of that path is implemented,
+      and the guide walks through it in order.</p>
+    <a class="btn btn--white" href="download.html">Download <span class="chev">›</span></a>
+    <a class="btn btn--green" href="document.html">Read the guide <span class="chev">›</span></a>
+  </div>
+</section>
+
+<!-- ================================= footer ============================== -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h2 class="foot-title">RemoteAssist</h2>
+        <p>A consent-first, end-to-end-encrypted remote support and remote desktop system. WebRTC transport,
+          cryptographic device pairing, a broker you host yourself.</p>
+        <nav class="socials" aria-label="Project links">
+          <a href="https://github.com/Vivek202509/remoteassist"><span aria-hidden="true">gh</span><span class="visually-hidden">RemoteAssist source on GitHub</span></a>
+        </nav>
+      </div>
+      <div>
+        <h2 class="foot-title" data-i18n="foot.product">Product</h2>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="download.html">Download</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="#security">Security</a></li>
+          <li><a href="#platforms">Platform status</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="foot-title" data-i18n="foot.resources">Resources</h2>
+        <ul>
+          <li><a href="document.html">Documentation</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/PROTOCOL.md">Protocol spec</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/ARCHITECTURE.md">Architecture</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/SECURITY_THREAT_MODEL.md">Threat model</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="foot-title" data-i18n="foot.company">Company</h2>
+        <ul>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/issues">Report an issue</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/blob/main/LICENSE">Licence (MIT)</a></li>
+          <li><a href="document.html#privacy">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; <span data-year>2026</span> RemoteAssist contributors. Released under the MIT licence.</span>
+      <span>Built with WebRTC, Kotlin/Compose and Node.js.</span>
+    </div>
+  </div>
+</footer>
+
+<button class="to-top" type="button" aria-label="Back to top">↑</button>
+
+<script src="assets/js/product-status.js"></script>
+<script src="assets/js/site.js"></script>
+<script src="assets/js/i18n.js"></script>
+</body>
+</html>

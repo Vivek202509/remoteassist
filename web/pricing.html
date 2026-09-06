@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pricing — RemoteAssist</title>
+<meta name="description" content="RemoteAssist is MIT licensed and free to self-host. It has not been commercially released, and no prices have been set.">
+<meta property="og:site_name" content="RemoteAssist">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pricing — RemoteAssist">
+<meta property="og:description" content="RemoteAssist is MIT licensed and free to self-host. It has not been commercially released, and no prices have been set.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/site.css">
+<script>try{var s=localStorage.getItem('ra-theme');document.documentElement.setAttribute('data-theme',s||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));}catch(e){}</script>
+</head>
+<body>
+
+<svg width="0" height="0" class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/>
+  </symbol>
+</svg>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="dropdown">
+      <button class="dropdown__toggle" type="button" aria-expanded="false" aria-controls="accounts-note">
+        <span data-i18n="top.accounts">Accounts</span> <span aria-hidden="true">&#9662;</span>
+      </button>
+      <div class="dropdown__menu" id="accounts-note">
+        <p class="dropdown__lead">Sign-in is not available</p>
+        <p class="dropdown__note" data-status="notices.accounts">There is no account system. Devices authenticate with their own hardware-backed keys, so there is nothing to sign in to.</p>
+      </div>
+    </div>
+    <nav class="socials" aria-label="Project links">
+      <a href="https://github.com/Vivek202509/remoteassist"><span aria-hidden="true">gh</span><span class="visually-hidden">RemoteAssist source on GitHub</span></a>
+    </nav>
+    <button class="theme-toggle" type="button" aria-pressed="false">
+      <span class="theme-toggle__icon" aria-hidden="true">&#9686;</span>
+      <span data-i18n="top.darkmode">Dark mode</span>
+    </button>
+    <div class="lang">
+      <label for="lang-select" data-i18n="top.language">Language:</label>
+      <select id="lang-select">
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <img class="brand__mark" src="assets/img/logo.svg" alt="" width="52" height="52">
+      <span>
+        <span class="brand__word"><b>REMOTE</b><span>ASSIST</span></span>
+        <span class="brand__tag">Consent-first remote control</span>
+      </span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Menu"><span></span></button>
+    <nav class="nav" id="primary-nav" aria-label="Main">
+      <ul>
+        <li><a href="index.html#features" data-i18n="nav.what">What&rsquo;s RemoteAssist?</a></li>
+        <li><a href="download.html" data-i18n="nav.download">Download</a></li>
+        <li><a href="document.html" data-i18n="nav.document">Document</a></li>
+        <li><a href="pricing.html" aria-current="page" data-i18n="nav.pricing">Pricing</a></li>
+        <li><a href="blog.html" data-i18n="nav.blog">Blog</a></li>
+        <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="page-head">
+  <div class="wrap">
+    <p class="crumbs"><a href="index.html">Home</a> / Pricing</p>
+    <h1>Pricing</h1>
+    <p>The software is MIT licensed and free to self-host. Nothing else is for sale yet — this page says what
+      exists rather than showing numbers nobody has agreed to.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="center">
+      <p class="eyebrow">Today</p>
+      <h2 class="section-title">What it costs</h2>
+    </div>
+    <p class="note note--strong mb-md"><strong>Pricing coming soon.</strong>
+      <span data-status="notices.pricing">RemoteAssist has not been commercially released and no prices have
+      been set. The self-hosted software is MIT licensed and free.</span> There is no free trial either,
+      because there is nothing to trial <em>from</em> — the free tier below is the whole product.</p>
+
+    <div class="plans plans--two">
+      <div class="plan plan--featured">
+        <div class="plan__head">
+          <h3>Self-hosted</h3>
+          <div class="plan__price">Free<small>MIT licence</small></div>
+        </div>
+        <ul>
+          <li>Unlimited devices and sessions</li>
+          <li>Host and controller in every install</li>
+          <li>Cryptographic pairing</li>
+          <li>Unattended grants</li>
+          <li>Your own broker and coturn</li>
+          <li>Full source, no telemetry</li>
+        </ul>
+        <div class="plan__foot"><a class="btn btn--green" href="download.html">Build it</a></div>
+      </div>
+
+      <div class="plan plan--unpriced">
+        <div class="plan__head">
+          <h3>Managed service</h3>
+          <div class="plan__price plan__price--tbd">Pricing coming soon<small>not commercially released</small></div>
+        </div>
+        <ul>
+          <li class="is-off">Managed broker</li>
+          <li class="is-off">Hosted TURN relay capacity</li>
+          <li class="is-off">Device groups and address book</li>
+          <li class="is-off">Session audit log</li>
+          <li class="is-off">Support commitment</li>
+          <li class="is-off">Single sign-on</li>
+        </ul>
+        <div class="plan__foot">
+          <p class="plan__unavailable">Not available. No managed service is running, no price has been set,
+            and nothing on this page can be ordered.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--alt">
+  <div class="wrap">
+    <div class="center">
+      <p class="eyebrow">Line by line</p>
+      <h2 class="section-title">What you get today</h2>
+      <p class="section-sub">Every security property is in the free tier, because there is no other tier. The
+        right-hand column records what a managed service <em>would</em> add if one is ever built — it is a
+        sketch, not an offer.</p>
+    </div>
+    <div class="table-scroll">
+      <table class="matrix">
+        <caption>&ldquo;Not built&rdquo; means exactly that: no managed service exists and none is being sold.</caption>
+        <thead>
+          <tr><th scope="col">Capability</th><th scope="col">Self-hosted (today)</th><th scope="col">Managed service</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">End-to-end encrypted media</th><td>Yes</td><td>Would be identical</td></tr>
+          <tr><th scope="row">Cryptographic pairing &amp; safety number</th><td>Yes</td><td>Would be identical</td></tr>
+          <tr><th scope="row">Signed DTLS fingerprints</th><td>Yes</td><td>Would be identical</td></tr>
+          <tr><th scope="row">Unattended grants</th><td>Yes</td><td>Would be identical</td></tr>
+          <tr><th scope="row">Devices</th><td>Unlimited</td><td>Undecided</td></tr>
+          <tr><th scope="row">Signaling broker</th><td>You run it</td><td><span class="badge badge--soon">Not built</span></td></tr>
+          <tr><th scope="row">TURN relay</th><td>You run coturn</td><td><span class="badge badge--soon">Not built</span></td></tr>
+          <tr><th scope="row">Address book &amp; groups</th><td>—</td><td><span class="badge badge--soon">Not built</span></td></tr>
+          <tr><th scope="row">Session audit log</th><td>—</td><td><span class="badge badge--soon">Not built</span></td></tr>
+          <tr><th scope="row">Single sign-on / SCIM</th><td>—</td><td><span class="badge badge--soon">Not built</span></td></tr>
+          <tr><th scope="row">Support</th><td>GitHub issues</td><td><span class="badge badge--soon">Not offered</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="center">
+      <p class="eyebrow">Questions</p>
+      <h2 class="section-title">Pricing FAQ</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>So what does it cost?</summary>
+        <div>Nothing. The source is MIT licensed and the only thing you spend is the time to run a broker and,
+          for cross-network sessions, a TURN server. No price has been set for anything else because nothing
+          else is being sold yet.</div>
+      </details>
+      <details>
+        <summary>Is the free tier crippled in any way?</summary>
+        <div>No. Every security and session feature is in the source, under the MIT licence. What you take on
+          is running a broker and a TURN server, and being your own support desk.</div>
+      </details>
+      <details>
+        <summary>Is there a free trial?</summary>
+        <div>There is no trial, because there is no paid product to trial from. Self-hosting is the product,
+          and it is free permanently under the licence it already carries.</div>
+      </details>
+      <details>
+        <summary>Can I buy support?</summary>
+        <div>Not today. There is no support contract, no response-time commitment and no sales process.
+          Questions and bugs go to the
+          <a href="https://github.com/Vivek202509/remoteassist/issues">issue tracker</a>, where the answers
+          stay public.</div>
+      </details>
+      <details>
+        <summary>If you host a broker one day, will it see my screen?</summary>
+        <div>No. Who operates the signaling service does not change what it can see: media is peer-to-peer and
+          encrypted end to end, and a relay only forwards packets it has no key for. That property comes from
+          the protocol, not from the hosting arrangement.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>It is free, so start there</h2>
+    <p>Build it, read the source, run your own broker. If a managed service ever appears, nothing you do now
+      will be locked out of it.</p>
+    <a class="btn btn--white" href="download.html">Download <span class="chev">›</span></a>
+    <a class="btn btn--green" href="document.html">Read the guide <span class="chev">›</span></a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h2 class="foot-title">RemoteAssist</h2>
+        <p>A consent-first, end-to-end-encrypted remote support and remote desktop system.</p>
+        <nav class="socials" aria-label="Project links">
+          <a href="https://github.com/Vivek202509/remoteassist"><span aria-hidden="true">gh</span><span class="visually-hidden">RemoteAssist source on GitHub</span></a>
+        </nav>
+      </div>
+      <div>
+        <h2 class="foot-title" data-i18n="foot.product">Product</h2>
+        <ul>
+          <li><a href="index.html#features">Features</a></li>
+          <li><a href="download.html">Download</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="index.html#platforms">Platform status</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="foot-title" data-i18n="foot.resources">Resources</h2>
+        <ul>
+          <li><a href="document.html">Documentation</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/blob/main/docs/PROTOCOL.md">Protocol spec</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="foot-title" data-i18n="foot.company">Company</h2>
+        <ul>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/issues">Report an issue</a></li>
+          <li><a href="https://github.com/Vivek202509/remoteassist/blob/main/LICENSE">Licence (MIT)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; <span data-year>2026</span> RemoteAssist contributors. MIT licence.</span>
+      <span>Built with WebRTC, Kotlin/Compose and Node.js.</span>
+    </div>
+  </div>
+</footer>
+
+<button class="to-top" type="button" aria-label="Back to top">↑</button>
+<script src="assets/js/product-status.js"></script>
+<script src="assets/js/site.js"></script>
+<script src="assets/js/i18n.js"></script>
+</body>
+</html>

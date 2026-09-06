@@ -58,6 +58,16 @@ techee/
 │               ├── host/                     # capture, input, unattended, wake services
 │               ├── fcm/RemoteFcmService.kt   # wake receiver + coordinator
 │               └── ui/                       # Compose screens + theme
+├── web/                        # Marketing website (static HTML/CSS/JS)  (RUNNABLE)
+│   ├── index.html              #   hero, features, security, platform status, cost, FAQ
+│   ├── download.html           #   Android / Windows preview / broker build guides
+│   ├── document.html           #   docs with sticky TOC, status & naming, troubleshooting
+│   ├── pricing.html blog.html contact.html
+│   ├── serve.js                #   zero-dependency preview server (not for production)
+│   ├── DEPLOYMENT.md           #   static hosting + response headers (CSP, etc.)
+│   ├── test/qa.js              #   zero-dependency QA suite
+│   └── assets/                 #   one stylesheet, three scripts, SVG logo
+│       └── js/product-status.js  # single source for version + platform status
 ├── play_console_declarations.md   # store-submission declaration text
 ├── play_console_reviewer_notes.md # reviewer notes + test-credentials template
 ├── remoteassist_demo_captions.srt # demo-video captions
@@ -89,6 +99,28 @@ server runs fully without it (attended sessions need no wake).
 - On a join to an **offline** host, sends an **FCM high-priority data-only wake** and
   queues the request until the host reconnects.
 - Never sees media — only connection-setup metadata.
+
+---
+
+## 1b. Run the website (works now)
+
+```bash
+node web/serve.js        # http://localhost:5173  (development preview only)
+node web/test/qa.js      # 148 checks: links, anchors, metadata, status drift, serve.js
+```
+
+Static HTML — no build step, no dependencies, no external requests. Deploy it to any static host,
+or just open `web/index.html`.
+
+The site invents nothing: there are no prices (the page says "pricing coming soon"), no login
+form, no contact endpoint, no invented social accounts and no download links to artifacts that
+do not exist. Platform status, the version and the acceptance notices come from one file,
+[`web/assets/js/product-status.js`](web/assets/js/product-status.js), written from this README
+and `docs/CROSS_PLATFORM_TEST_MATRIX.md` — so the pages cannot drift apart from each other, and
+the QA suite fails if they drift from that file. See [`web/README.md`](web/README.md) for the
+placeholder policy and the list of business inputs a public launch still needs, and
+[`web/DEPLOYMENT.md`](web/DEPLOYMENT.md) for the response headers to set. `serve.js` is a
+development preview server, not a production one.
 
 ---
 

@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "smoke": "node test/smoke.js"
+    "smoke": "node test/smoke.js",
+    "protocol": "node test/protocol.js",
+    "test": "node test/protocol.js && node test/smoke.js"
   },
   "engines": {
     "node": ">=18"

@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SIPSorceryMedia.Encoders" Version="10.0.4" />
+    <PackageReference Include="Vortice.Direct3D11" Version="3.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The wheel-delta conversion and the native INPUT size are interop details that
+         must not be public, but both are exactly the kind of thing that is wrong
+         silently: an overflowing conversion still compiles, and a wrong struct size
+         makes SendInput inject nothing while every managed test passes. -->
+    <InternalsVisibleTo Include="Techee.Windows.Host.Tests" />
+  </ItemGroup>
+
+</Project>

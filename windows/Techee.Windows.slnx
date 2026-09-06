@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Techee.Crypto/Techee.Crypto.csproj" />
+    <Project Path="src/Techee.Protocol/Techee.Protocol.csproj" />
+    <Project Path="src/Techee.Session/Techee.Session.csproj" />
+    <Project Path="src/Techee.Signaling/Techee.Signaling.csproj" />
+    <Project Path="src/Techee.Store/Techee.Store.csproj" />
+    <Project Path="src/Techee.WebRtc/Techee.WebRtc.csproj" />
+    <Project Path="src/Techee.Windows.ControllerApp/Techee.Windows.ControllerApp.csproj" />
+    <Project Path="src/Techee.Windows.Host/Techee.Windows.Host.csproj" />
+    <Project Path="src/Techee.Windows.HostApp/Techee.Windows.HostApp.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Techee.Crypto.Tests/Techee.Crypto.Tests.csproj" />
+    <Project Path="tests/Techee.Protocol.Tests/Techee.Protocol.Tests.csproj" />
+    <Project Path="tests/Techee.Session.Tests/Techee.Session.Tests.csproj" />
+    <Project Path="tests/Techee.Signaling.Tests/Techee.Signaling.Tests.csproj" />
+    <Project Path="tests/Techee.Store.Tests/Techee.Store.Tests.csproj" />
+    <Project Path="tests/Techee.WebRtc.Tests/Techee.WebRtc.Tests.csproj" />
+    <Project Path="tests/Techee.Windows.Host.Tests/Techee.Windows.Host.Tests.csproj" />
+  </Folder>
+</Solution>

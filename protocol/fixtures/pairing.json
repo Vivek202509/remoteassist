@@ -1,0 +1,70 @@
+{
+  "_comment": [
+    "NORMATIVE cross-language fixtures for the Techee pairing ceremony.",
+    "",
+    "The safety number is what matters most here: two humans compare it out of band, so",
+    "if Android and Windows compute it differently, pairing fails visibly and",
+    "unfixably for the user. It is pinned below and asserted in all three languages.",
+    "",
+    "IMPORTANT - the two proof transcripts are RAW CONCATENATIONS with no domain",
+    "separator and no length framing. That is not how the rest of Techee builds signed",
+    "input, and it is a known weakness (see docs/PROTOCOL.md section 2.3). It is",
+    "reproduced exactly because it is what the shipped Android app does; an endpoint",
+    "that framed them differently could not pair with any existing phone. The",
+    "concatenation is unambiguous ONLY because every field is fixed-length, so",
+    "implementations MUST enforce those lengths rather than assume them.",
+    "",
+    "All keypairs below are throwaways generated solely for this file."
+  ],
+  "lengths": {
+    "p256SpkiDer": 91,
+    "nonce": 32,
+    "sharedSecret": 32,
+    "_note": "P-256 SPKI DER is always 91 bytes. The unframed proof transcripts depend on this; verify it, do not trust it."
+  },
+  "keys": {
+    "hostIdentitySpkiB64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/qSkq6Fo2WfcTuqXnvuCw39Sa3Cye48z/BnwJa/BmkllVfs+j7tcTRc2Z4lEqknA+uPr3JRSfDpFafQbkY/IFw==",
+    "hostIdentityPkcs8B64": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg6AV11rk0EWIwTAiIgAscsXzQhAFzDldgnzfiW8NpC4ihRANCAAT+pKSroWjZZ9xO6pee+4LDf1JrcLJ7jzP8GfAlr8GaSWVV+z6Pu1xNFzZniUSqScD64+vclFJ8OkVp9BuRj8gX",
+    "controllerIdentitySpkiB64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEsjKqy0D7FpAACE5uRgQ1GpAbn0Q+iFnQYDbnt8E4Z/cK5oZClpGvcJFtJcOC59HTES+7KfFBqCBdoAmqci9RHw==",
+    "controllerIdentityPkcs8B64": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgHHvt/ehda/nmQgaEQAc4CjXtbeelHdtVVI7tDi4q51OhRANCAASyMqrLQPsWkAAITm5GBDUakBufRD6IWdBgNue3wThn9wrmhkKWka9wkW0lw4Ln0dMRL7sp8UGoIF2gCapyL1Ef",
+    "hostEphemeralSpkiB64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAETMP/qI509qjKDpME3w+1Myzh6Pl3D/AdrWUNwsWbczrXr1qKEpsihb2zPCTnP3A9nsCbYi6jFqZtKDdHwOVfVQ==",
+    "hostEphemeralPkcs8B64": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgHcR2OIkgbDjcI6UEwRhYmNAdQkbRJT2vqrSs661q9cChRANCAARMw/+ojnT2qMoOkwTfD7UzLOHo+XcP8B2tZQ3CxZtzOtevWooSmyKFvbM8JOc/cD2ewJtiLqMWpm0oN0fA5V9V",
+    "controllerEphemeralSpkiB64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEngN1v+P2R728iCClwzc8cGPW0hrAUnDnpZFTrFi3gIJ+edN/HsevrEH5nsA90W+TXTM6eScG0P3jFIyeKGE5yQ==",
+    "controllerEphemeralPkcs8B64": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgsmmpTYYXf/lHpajj4aDxAgZ8MY61N3VCLKAJ5Q3TY7ehRANCAASeA3W/4/ZHvbyIIKXDNzxwY9bSGsBScOelkVOsWLeAgn55038ex6+sQfmewD3Rb5NdMzp5JwbQ/eMUjJ4oYTnJ"
+  },
+  "nonceB64": "0i3xMF3gVM3GJ6bLF30Etz+StRMVc9qJbDEYSdSGbNM=",
+  "ecdh": {
+    "_rule": "Raw ECDH shared secret = the X coordinate, UNHASHED. Android uses KeyAgreement.generateSecret() which returns exactly this; .NET must use DeriveRawSecretAgreement (NOT DeriveKeyMaterial, which hashes). Applying a KDF here changes the safety number and breaks pairing.",
+    "sharedSecretB64": "ovSal1s1ERucFUkdW6q/4d4V+sRGu83poiJ4zjCbpxs="
+  },
+  "safetyNumber": {
+    "_rule": "sha256(shared || min(pubA,pubB) || max(pubA,pubB)), ordered by the lowercase-hex rendering of each DER key; then the first 6 bytes each rendered as a zero-padded 3-digit decimal and joined by \"-\". 48 bits total, no domain separation - a known weakness matched deliberately for compatibility.",
+    "expected": "088-180-108-029-158-208",
+    "_orderIndependent": "Computing it with the two identity keys swapped MUST give the same result."
+  },
+  "proofs": {
+    "controller": {
+      "_layout": "nonce || hostIdentitySpkiDer || controllerEphemeralSpkiDer",
+      "signedBy": "controller identity key",
+      "signatureB64": "MEYCIQDWm8DWu217scOt32ey9D6pWRIiNqVQLgwV2TDnyq5rGgIhAMSybJFIp+z/m7x054mYSb/ENDigGoF/GHim+aYzsjh0"
+    },
+    "host": {
+      "_layout": "controllerEphemeralSpkiDer || controllerIdentitySpkiDer",
+      "signedBy": "host identity key",
+      "signatureB64": "MEYCIQCySicSflkbCPJLdT1/fA8ZdozLZQSokQp1R0OQbfevAQIhAIBmxdjjgosyZNuxxyyrWeWZ5850NMu8tvfzZtFBA6l8",
+      "_weakness": "Carries no nonce and does not cover the host own ephemeral key, so it proves possession of the host identity but contributes no freshness. The out-of-band safety number remains the real anti-MITM check."
+    }
+  },
+  "offerJson": {
+    "_rule": "QR payload field names, matching Android PairingManager.PairingOffer exactly.",
+    "fields": [
+      "hostPub",
+      "ephPub",
+      "nonce",
+      "hostName",
+      "relay",
+      "ttl"
+    ],
+    "ttlMs": 120000
+  }
+}

@@ -1,0 +1,239 @@
+{
+  "_comment": [
+    "NORMATIVE fixtures for endpoint metadata (platform / version / capabilities) and for",
+    "grant permissions.",
+    "",
+    "THE CENTRAL RULE, restated because it is the one that is easy to get wrong:",
+    "  Capabilities are DESCRIPTIVE. Permissions are AUTHORITATIVE.",
+    "A peer advertising 'power.shutdown' has told you it owns a shutdown button. It has NOT",
+    "told you it may press yours. Only a grant permission may authorise an action, and the",
+    "grant is evaluated locally by the host that will execute the action — never by the",
+    "broker, and never from the peer's own advertisement."
+  ],
+
+  "protocolVersion": { "current": 1, "minSupported": 1 },
+
+  "platforms": ["android", "windows"],
+
+  "knownCapabilities": [
+    "screen.share",
+    "screen.receive",
+    "input.send",
+    "input.receive",
+    "audio.microphone.send",
+    "audio.desktop.send",
+    "audio.receive",
+    "clipboard",
+    "display.multi",
+    "nav.android",
+    "power.lock",
+    "power.sleep",
+    "power.hibernate",
+    "power.restart",
+    "power.shutdown"
+  ],
+
+  "knownPermissions": [
+    "screen.view",
+    "input.control",
+    "clipboard.read",
+    "clipboard.write",
+    "system.lock",
+    "system.sleep",
+    "system.hibernate",
+    "system.restart",
+    "system.shutdown",
+    "files.transfer"
+  ],
+
+  "limits": {
+    "maxCapabilities": 32,
+    "maxCapabilityLength": 40,
+    "maxVersionLength": 32,
+    "maxPermissions": 32
+  },
+
+  "metaVectors": [
+    {
+      "name": "a full Windows host advertisement",
+      "input": {
+        "platform": "windows",
+        "version": "0.1.0",
+        "capabilities": ["screen.share", "input.receive", "clipboard", "display.multi", "power.sleep", "power.restart"]
+      },
+      "expect": {
+        "platform": "windows",
+        "version": "0.1.0",
+        "capabilities": ["clipboard", "display.multi", "input.receive", "power.restart", "power.sleep", "screen.share"]
+      },
+      "_note": "capabilities are returned sorted and de-duplicated so equality checks are stable across languages"
+    },
+    {
+      "name": "a legacy Android client that predates this schema and sends no meta at all",
+      "input": null,
+      "expect": null,
+      "_note": "MUST be accepted. Absent meta is not an error; it means 'unknown', and the UI must degrade to showing no capability-gated affordances rather than refusing the peer."
+    },
+    {
+      "name": "unknown capability tokens are dropped, not rejected",
+      "input": { "platform": "android", "version": "1.0", "capabilities": ["screen.share", "quantum.teleport", "input.receive"] },
+      "expect": { "platform": "android", "version": "1.0", "capabilities": ["input.receive", "screen.share"] },
+      "_note": "Forward compatibility: a newer peer advertising capabilities we have never heard of must still connect."
+    },
+    {
+      "name": "duplicate capabilities collapse",
+      "input": { "platform": "android", "version": "1.0", "capabilities": ["clipboard", "clipboard", "clipboard"] },
+      "expect": { "platform": "android", "version": "1.0", "capabilities": ["clipboard"] }
+    },
+    {
+      "name": "unknown platform is rejected outright",
+      "input": { "platform": "toaster", "version": "1.0", "capabilities": [] },
+      "expect": null
+    },
+    {
+      "name": "missing platform is rejected",
+      "input": { "version": "1.0", "capabilities": [] },
+      "expect": null
+    },
+    {
+      "name": "non-string capability entries are dropped without failing the whole meta",
+      "input": { "platform": "windows", "version": "1.0", "capabilities": ["clipboard", 42, null, { "a": 1 }] },
+      "expect": { "platform": "windows", "version": "1.0", "capabilities": ["clipboard"] }
+    },
+    {
+      "name": "capabilities is not an array",
+      "input": { "platform": "windows", "version": "1.0", "capabilities": "everything" },
+      "expect": { "platform": "windows", "version": "1.0", "capabilities": [] }
+    },
+    {
+      "name": "oversized capability list is truncated to the limit rather than rejected",
+      "input": { "platform": "windows", "version": "1.0", "capabilities": "GENERATE:64" },
+      "expect": { "platform": "windows", "version": "1.0", "capabilities": [] },
+      "_note": "GENERATE:64 means the test harness synthesises 64 distinct unknown tokens. All are unknown, so all are dropped; the point of the vector is that a 64-entry list must not blow up or be stored verbatim."
+    },
+    {
+      "name": "overlong version string is rejected",
+      "input": { "platform": "windows", "version": "0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0", "capabilities": [] },
+      "expect": null
+    },
+    {
+      "name": "missing version defaults to unknown rather than failing",
+      "input": { "platform": "windows", "capabilities": ["clipboard"] },
+      "expect": { "platform": "windows", "version": "unknown", "capabilities": ["clipboard"] }
+    }
+  ],
+
+  "legacyScopeMapping": {
+    "_rule": [
+      "The shipped Android GrantStore uses enum Scope { VIEW, CONTROL, FILES, CLIPBOARD } and",
+      "serialises it as a 'scope' array. v1 grants use a 'permissions' array of the tokens above.",
+      "A grant carrying only legacy 'scope' MUST be widened through this table; a grant carrying",
+      "'permissions' uses them directly and 'scope' is ignored.",
+      "",
+      "CRITICAL, and the reason this table is a fixture rather than a comment: no legacy scope maps",
+      "to any system.* permission. Every grant created before power control existed therefore confers",
+      "NO power over the machine. Fail closed on upgrade — an old grant must never silently acquire",
+      "the ability to shut down a PC."
+    ],
+    "vectors": [
+      { "scope": ["VIEW"], "permissions": ["screen.view"] },
+      { "scope": ["CONTROL"], "permissions": ["input.control", "screen.view"], "_note": "CONTROL implies VIEW: controlling a screen you cannot see is not a coherent grant" },
+      { "scope": ["CLIPBOARD"], "permissions": ["clipboard.read", "clipboard.write"] },
+      { "scope": ["FILES"], "permissions": ["files.transfer"], "_note": "reserved token; no Techee implementation acts on it" },
+      { "scope": ["VIEW", "CONTROL", "CLIPBOARD"], "permissions": ["clipboard.read", "clipboard.write", "input.control", "screen.view"] },
+      { "scope": [], "permissions": [] },
+      { "scope": ["VIEW", "SHUTDOWN"], "permissions": ["screen.view"], "_note": "unknown legacy scope names are dropped, never guessed at" }
+    ]
+  },
+
+  "permissionRequiredFor": {
+    "_rule": "Which grant permission each v1 control message requires before a host may execute it. A message whose permission is absent from the grant MUST be discarded and audited as PROTOCOL_REJECTION, not executed.",
+    "pointer.tap": "input.control",
+    "pointer.swipe": "input.control",
+    "pointer.move": "input.control",
+    "pointer.down": "input.control",
+    "pointer.up": "input.control",
+    "pointer.wheel": "input.control",
+    "keyboard.keyDown": "input.control",
+    "keyboard.keyUp": "input.control",
+    "keyboard.text": "input.control",
+    "nav.key": "input.control",
+    "clipboard.set": "clipboard.write",
+    "clipboard.request": "clipboard.read",
+    "clipboard.data": null,
+    "system.lock": "system.lock",
+    "system.sleep": "system.sleep",
+    "system.hibernate": "system.hibernate",
+    "system.restart": "system.restart",
+    "system.shutdown": "system.shutdown",
+    "display.list": "screen.view",
+    "display.select": "screen.view",
+    "display.info": null,
+    "host.status": null,
+    "host.callState": null,
+    "hello": null,
+    "hello.ack": null,
+    "error": null
+  },
+
+  "grantVectors": [
+    {
+      "name": "a screen-control grant does NOT imply shutdown",
+      "grant": { "grantId": "g1", "controllerId": "aa", "active": true, "permissions": ["screen.view", "input.control"] },
+      "permits": ["screen.view", "input.control"],
+      "denies": ["system.shutdown", "system.restart", "system.sleep", "clipboard.read", "clipboard.write"]
+    },
+    {
+      "name": "an inactive grant permits nothing",
+      "grant": { "grantId": "g2", "controllerId": "aa", "active": false, "permissions": ["screen.view", "input.control"] },
+      "permits": [],
+      "denies": ["screen.view", "input.control"]
+    },
+    {
+      "name": "an expired grant permits nothing",
+      "grant": { "grantId": "g3", "controllerId": "aa", "active": true, "expiresAt": 1000, "permissions": ["screen.view"] },
+      "nowMs": 2000,
+      "permits": [],
+      "denies": ["screen.view"]
+    },
+    {
+      "name": "expiresAt exactly equal to now is still valid (expiry is strictly-less-than)",
+      "grant": { "grantId": "g4", "controllerId": "aa", "active": true, "expiresAt": 2000, "permissions": ["screen.view"] },
+      "nowMs": 2000,
+      "permits": ["screen.view"],
+      "denies": []
+    },
+    {
+      "name": "expiresAt of 0 means expired at the epoch, NOT 'never expires' — a truthiness guard on this field reads 0 as never-expiring and fails open",
+      "grant": { "grantId": "g5", "controllerId": "aa", "active": true, "expiresAt": 0, "permissions": ["screen.view"] },
+      "nowMs": 2000,
+      "permits": [],
+      "denies": ["screen.view"]
+    },
+    {
+      "name": "absent expiresAt means no expiry",
+      "grant": { "grantId": "g6", "controllerId": "aa", "active": true, "permissions": ["screen.view"] },
+      "nowMs": 99999999999,
+      "permits": ["screen.view"],
+      "denies": []
+    },
+    {
+      "name": "a legacy scope-only grant is widened, and confers no system power",
+      "grant": { "grantId": "g7", "controllerId": "aa", "active": true, "scope": ["VIEW", "CONTROL"] },
+      "permits": ["screen.view", "input.control"],
+      "denies": ["system.lock", "system.sleep", "system.restart", "system.shutdown"]
+    },
+    {
+      "name": "a grant with neither permissions nor scope permits nothing",
+      "grant": { "grantId": "g8", "controllerId": "aa", "active": true },
+      "permits": [],
+      "denies": ["screen.view", "input.control"]
+    },
+    {
+      "name": "unknown permission tokens in a grant are dropped rather than honoured",
+      "grant": { "grantId": "g9", "controllerId": "aa", "active": true, "permissions": ["screen.view", "system.selfDestruct"] },
+      "permits": ["screen.view"],
+      "denies": ["system.selfDestruct"]
+    }
+  ]
+}

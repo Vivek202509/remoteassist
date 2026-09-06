@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- -windows, and Windows-only, purely for the viewer. Everything below the UI is
+         the same portable stack the host uses. -->
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+
+    <!-- Exe rather than WinExe on purpose: the console stays attached, so the session
+         log and the picture are visible at the same time. A harness whose diagnostics
+         disappear the moment the window opens is a harness that cannot be debugged. -->
+    <OutputType>Exe</OutputType>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>techee-ctl</AssemblyName>
+    <RootNamespace>Techee.Windows.ControllerApp</RootNamespace>
+  </PropertyGroup>
+
+  <!-- The runnable Techee Windows controller: the W5 counterpart to techee-host.
+       Until this project existed the only controller in the tree was a private class
+       inside ControlOverBrokerTests, so D6 (Windows controller -> Windows host) could
+       not be executed at all, and D7/D8 could only ever be proven against the host's
+       own injector rather than driven by a real remote peer. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Techee.Crypto\Techee.Crypto.csproj" />
+    <ProjectReference Include="..\Techee.Protocol\Techee.Protocol.csproj" />
+    <ProjectReference Include="..\Techee.Session\Techee.Session.csproj" />
+    <ProjectReference Include="..\Techee.Signaling\Techee.Signaling.csproj" />
+    <ProjectReference Include="..\Techee.Store\Techee.Store.csproj" />
+    <ProjectReference Include="..\Techee.WebRtc\Techee.WebRtc.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The same libvpx binding the host encodes with, used here for its decoder. Same
+         version deliberately: if the two ever disagree about VP8, it must not be
+         because the controller was built against a different libvpx. -->
+    <PackageReference Include="SIPSorceryMedia.Encoders" Version="10.0.4" />
+  </ItemGroup>
+
+</Project>
