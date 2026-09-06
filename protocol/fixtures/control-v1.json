@@ -1,0 +1,260 @@
+{
+  "_comment": [
+    "NORMATIVE fixtures for the Techee control DataChannel.",
+    "",
+    "Two dialects share one channel:",
+    "  v0 (legacy)  what the shipped Android app sends today: {\"t\":\"tap\",...}, no version field.",
+    "  v1           versioned and platform-neutral: {\"v\":1,\"t\":\"pointer.tap\",...}.",
+    "",
+    "Every implementation MUST decode both and MUST normalise them to the same internal command,",
+    "so that a v1 Windows host and a v0 Android controller interoperate without either side",
+    "knowing which dialect the other speaks.",
+    "",
+    "Rejection is always silent and always local: a bad frame is dropped, never executed, and",
+    "never allowed to throw out of the DataChannel callback. On an unattended host that callback",
+    "runs on the WebRTC network thread and an exception there takes down the whole machine agent."
+  ],
+
+  "limits": {
+    "maxFrameBytes": 65536,
+    "maxTextBytes": 4096,
+    "maxClipboardBytes": 65536,
+    "maxSwipeMs": 10000,
+    "defaultSwipeMs": 200
+  },
+
+  "rateLimits": {
+    "_note": "Advisory ceilings a host SHOULD enforce per session. Exceeding them means dropping frames, not tearing down the session — a controller on a bad network must not be able to disconnect itself, and a hostile one must not be able to wedge the input queue.",
+    "pointer.move": 250,
+    "default": 100,
+    "system.*": 0.2
+  },
+
+  "decodeVectors": [
+    {
+      "name": "v0 tap — the exact frame MainViewModel.sendTap emits today",
+      "frame": { "t": "tap", "x": 0.5, "y": 0.25 },
+      "expect": { "kind": "pointer.tap", "x": 0.5, "y": 0.25 }
+    },
+    {
+      "name": "v1 tap normalises to the identical command",
+      "frame": { "v": 1, "t": "pointer.tap", "x": 0.5, "y": 0.25 },
+      "expect": { "kind": "pointer.tap", "x": 0.5, "y": 0.25 }
+    },
+    {
+      "name": "v0 swipe with explicit duration",
+      "frame": { "t": "swipe", "x1": 0.1, "y1": 0.2, "x2": 0.3, "y2": 0.4, "ms": 300 },
+      "expect": { "kind": "pointer.swipe", "x1": 0.1, "y1": 0.2, "x2": 0.3, "y2": 0.4, "ms": 300 }
+    },
+    {
+      "name": "v0 swipe without ms takes the default",
+      "frame": { "t": "swipe", "x1": 0.1, "y1": 0.2, "x2": 0.3, "y2": 0.4 },
+      "expect": { "kind": "pointer.swipe", "x1": 0.1, "y1": 0.2, "x2": 0.3, "y2": 0.4, "ms": 200 }
+    },
+    {
+      "name": "hostile swipe duration is clamped, not rejected — preserves shipped Android behaviour",
+      "frame": { "t": "swipe", "x1": 0, "y1": 0, "x2": 1, "y2": 1, "ms": 99999999 },
+      "expect": { "kind": "pointer.swipe", "x1": 0, "y1": 0, "x2": 1, "y2": 1, "ms": 10000 }
+    },
+    {
+      "name": "zero/negative swipe duration is clamped up to 1",
+      "frame": { "t": "swipe", "x1": 0, "y1": 0, "x2": 1, "y2": 1, "ms": -5 },
+      "expect": { "kind": "pointer.swipe", "x1": 0, "y1": 0, "x2": 1, "y2": 1, "ms": 1 }
+    },
+    {
+      "name": "out-of-range coordinates clamp to the edge rather than dropping the frame",
+      "frame": { "t": "tap", "x": 1.7, "y": -0.4 },
+      "expect": { "kind": "pointer.tap", "x": 1.0, "y": 0.0 }
+    },
+    {
+      "name": "v0 key BACK",
+      "frame": { "t": "key", "k": "BACK" },
+      "expect": { "kind": "nav.key", "key": "BACK" }
+    },
+    {
+      "name": "v1 nav.key HOME",
+      "frame": { "v": 1, "t": "nav.key", "k": "HOME" },
+      "expect": { "kind": "nav.key", "key": "HOME" }
+    },
+    {
+      "name": "v0 text",
+      "frame": { "t": "text", "s": "hello" },
+      "expect": { "kind": "keyboard.text", "text": "hello" }
+    },
+    {
+      "name": "v1 keyboard.text",
+      "frame": { "v": 1, "t": "keyboard.text", "s": "hello" },
+      "expect": { "kind": "keyboard.text", "text": "hello" }
+    },
+    {
+      "name": "v0 callstate is a host status report, not an input event",
+      "frame": { "t": "callstate", "state": "RINGING" },
+      "expect": { "kind": "host.callState", "state": "RINGING" }
+    },
+    {
+      "name": "pointer.move",
+      "frame": { "v": 1, "t": "pointer.move", "x": 0.42, "y": 0.6 },
+      "expect": { "kind": "pointer.move", "x": 0.42, "y": 0.6 }
+    },
+    {
+      "name": "pointer.down defaults to the left button",
+      "frame": { "v": 1, "t": "pointer.down", "x": 0.1, "y": 0.1 },
+      "expect": { "kind": "pointer.down", "x": 0.1, "y": 0.1, "button": "left" }
+    },
+    {
+      "name": "pointer.up with an explicit button",
+      "frame": { "v": 1, "t": "pointer.up", "x": 0.1, "y": 0.1, "b": "right" },
+      "expect": { "kind": "pointer.up", "x": 0.1, "y": 0.1, "button": "right" }
+    },
+    {
+      "name": "pointer.wheel, both axes",
+      "frame": { "v": 1, "t": "pointer.wheel", "x": 0.5, "y": 0.5, "dx": -1.0, "dy": 3.0 },
+      "expect": { "kind": "pointer.wheel", "x": 0.5, "y": 0.5, "dx": -1.0, "dy": 3.0 }
+    },
+    {
+      "name": "keyboard.keyDown carries a W3C KeyboardEvent.code, not a platform virtual-key number",
+      "frame": { "v": 1, "t": "keyboard.keyDown", "code": "KeyA" },
+      "expect": { "kind": "keyboard.keyDown", "code": "KeyA" }
+    },
+    {
+      "name": "keyboard.keyUp with modifiers",
+      "frame": { "v": 1, "t": "keyboard.keyUp", "code": "Enter", "mods": ["ControlLeft", "ShiftLeft"] },
+      "expect": { "kind": "keyboard.keyUp", "code": "Enter", "mods": ["ControlLeft", "ShiftLeft"] }
+    },
+    {
+      "name": "system.lock",
+      "frame": { "v": 1, "t": "system.lock" },
+      "expect": { "kind": "system.lock" }
+    },
+    {
+      "name": "system.restart",
+      "frame": { "v": 1, "t": "system.restart" },
+      "expect": { "kind": "system.restart" }
+    },
+    {
+      "name": "clipboard.set",
+      "frame": { "v": 1, "t": "clipboard.set", "mime": "text/plain", "s": "copied" },
+      "expect": { "kind": "clipboard.set", "mime": "text/plain", "text": "copied" }
+    },
+    {
+      "name": "clipboard.set defaults to text/plain when mime is omitted",
+      "frame": { "v": 1, "t": "clipboard.set", "s": "copied" },
+      "expect": { "kind": "clipboard.set", "mime": "text/plain", "text": "copied" }
+    },
+    {
+      "name": "clipboard.request",
+      "frame": { "v": 1, "t": "clipboard.request" },
+      "expect": { "kind": "clipboard.request" }
+    },
+    {
+      "name": "display.list",
+      "frame": { "v": 1, "t": "display.list" },
+      "expect": { "kind": "display.list" }
+    },
+    {
+      "name": "display.select",
+      "frame": { "v": 1, "t": "display.select", "id": "DISPLAY1" },
+      "expect": { "kind": "display.select", "id": "DISPLAY1" }
+    },
+    {
+      "_comment": "JSON has no integer type: 1 and 1.0 are the same number, and a JSON parser is free to surface either as the other. A JS parser cannot even tell them apart, so rejecting 1.0 is a rule one of the three languages is unable to implement. Accept any version that is numerically integral; judge the VALUE, never the spelling. Note this vector is only discriminating in a language whose parser preserves the distinction (Kotlin, C#) — in JS it arrives already collapsed to 1.",
+      "name": "a version spelled 1.0 is the same version as 1",
+      "frame": { "v": 1.0, "t": "pointer.tap", "x": 0.5, "y": 0.25 },
+      "expect": { "kind": "pointer.tap", "x": 0.5, "y": 0.25 }
+    },
+    {
+      "name": "hello carries the peer's capability advertisement over the E2E-authenticated channel",
+      "frame": { "v": 1, "t": "hello", "platform": "windows", "version": "0.1.0", "capabilities": ["screen.share", "input.receive"] },
+      "expect": { "kind": "hello", "platform": "windows", "version": "0.1.0", "capabilities": ["input.receive", "screen.share"] }
+    }
+  ],
+
+  "rejectVectors": [
+    { "name": "unknown message type", "frame": { "t": "selfDestruct" } },
+    { "name": "unknown v1 message type", "frame": { "v": 1, "t": "system.selfDestruct" } },
+    { "name": "empty object", "frame": {} },
+    { "name": "no type field", "frame": { "x": 0.5, "y": 0.5 } },
+    { "name": "tap with a missing coordinate", "frame": { "t": "tap", "x": 0.5 } },
+    { "name": "tap with a non-numeric coordinate", "frame": { "t": "tap", "x": "half", "y": 0.5 } },
+    { "name": "tap with a null coordinate", "frame": { "t": "tap", "x": null, "y": 0.5 } },
+    { "name": "tap with NaN", "frame": { "t": "tap", "x": "NaN", "y": 0.5 } },
+    { "name": "swipe missing an endpoint", "frame": { "t": "swipe", "x1": 0.1, "y1": 0.2, "x2": 0.3 } },
+    { "name": "key outside the allowlist", "frame": { "t": "key", "k": "POWER" } },
+    { "name": "key with an empty value", "frame": { "t": "key", "k": "" } },
+    { "name": "nav.key outside the allowlist", "frame": { "v": 1, "t": "nav.key", "k": "REBOOT" } },
+    { "name": "text that is not a JSON string", "frame": { "t": "text", "s": 42 } },
+    { "name": "keyboard.text that is not a JSON string", "frame": { "v": 1, "t": "keyboard.text", "s": true } },
+    { "name": "keyboard.keyDown with no code", "frame": { "v": 1, "t": "keyboard.keyDown" } },
+    { "name": "keyboard.keyDown with a non-string code", "frame": { "v": 1, "t": "keyboard.keyDown", "code": 65 } },
+    { "name": "pointer.wheel with a non-finite delta", "frame": { "v": 1, "t": "pointer.wheel", "x": 0.5, "y": 0.5, "dx": "Infinity", "dy": 0 } },
+    { "name": "pointer.up with an unknown button", "frame": { "v": 1, "t": "pointer.up", "x": 0.1, "y": 0.1, "b": "pedal" } },
+    { "name": "clipboard.set with a non-string payload", "frame": { "v": 1, "t": "clipboard.set", "s": { "a": 1 } } },
+    { "name": "clipboard.set with an unsupported mime — v1 is text/plain only", "frame": { "v": 1, "t": "clipboard.set", "mime": "text/html", "s": "<b>x</b>" } },
+    { "name": "display.select with no id", "frame": { "v": 1, "t": "display.select" } },
+    { "name": "unsupported future protocol version", "frame": { "v": 2, "t": "pointer.tap", "x": 0.5, "y": 0.5 } },
+    { "name": "a version that is not a number at all", "frame": { "v": "1", "t": "pointer.tap", "x": 0.5, "y": 0.5 } },
+    { "name": "a version with a fractional part is not a version we speak", "frame": { "v": 1.5, "t": "pointer.tap", "x": 0.5, "y": 0.5 } },
+    { "name": "a boolean version", "frame": { "v": true, "t": "pointer.tap", "x": 0.5, "y": 0.5 } },
+    { "name": "a null version — absent means legacy, but present-and-null is malformed", "frame": { "v": null, "t": "pointer.tap", "x": 0.5, "y": 0.5 } },
+    { "name": "version zero is not a legal explicit version", "frame": { "v": 0, "t": "pointer.tap", "x": 0.5, "y": 0.5 } },
+    { "name": "oversized text payload", "frame": { "v": 1, "t": "keyboard.text", "s": "GENERATE:5000" } },
+    { "name": "oversized clipboard payload", "frame": { "v": 1, "t": "clipboard.set", "s": "GENERATE:70000" } }
+  ],
+
+  "rawRejectVectors": [
+    { "name": "not JSON at all", "raw": "this is not json" },
+    { "name": "JSON array rather than an object", "raw": "[1,2,3]" },
+    { "name": "JSON string rather than an object", "raw": "\"tap\"" },
+    { "name": "JSON null", "raw": "null" },
+    { "name": "bare number", "raw": "7" },
+    { "name": "empty string", "raw": "" },
+    { "name": "truncated JSON", "raw": "{\"t\":\"tap\",\"x\":0.5" },
+    { "name": "deeply nested JSON used as a parser bomb", "raw": "GENERATE_NESTED:2000" }
+  ],
+
+  "encodeVectors": [
+    {
+      "_comment": "A v1 sender talking to a v0-only peer MUST downgrade the dialect. This is a presentation-layer downgrade only; it NEVER weakens authentication, which is enforced independently at the SDP layer and cannot be negotiated away.",
+      "name": "pointer.tap downgrades to a v0 tap",
+      "command": { "kind": "pointer.tap", "x": 0.5, "y": 0.25 },
+      "v1": { "v": 1, "t": "pointer.tap", "x": 0.5, "y": 0.25 },
+      "v0": { "t": "tap", "x": 0.5, "y": 0.25 }
+    },
+    {
+      "name": "pointer.swipe downgrades to a v0 swipe",
+      "command": { "kind": "pointer.swipe", "x1": 0.1, "y1": 0.2, "x2": 0.3, "y2": 0.4, "ms": 300 },
+      "v1": { "v": 1, "t": "pointer.swipe", "x1": 0.1, "y1": 0.2, "x2": 0.3, "y2": 0.4, "ms": 300 },
+      "v0": { "t": "swipe", "x1": 0.1, "y1": 0.2, "x2": 0.3, "y2": 0.4, "ms": 300 }
+    },
+    {
+      "name": "nav.key downgrades to a v0 key",
+      "command": { "kind": "nav.key", "key": "BACK" },
+      "v1": { "v": 1, "t": "nav.key", "k": "BACK" },
+      "v0": { "t": "key", "k": "BACK" }
+    },
+    {
+      "name": "keyboard.text downgrades to a v0 text",
+      "command": { "kind": "keyboard.text", "text": "hi" },
+      "v1": { "v": 1, "t": "keyboard.text", "s": "hi" },
+      "v0": { "t": "text", "s": "hi" }
+    },
+    {
+      "name": "host.callState downgrades to a v0 callstate",
+      "command": { "kind": "host.callState", "state": "IDLE" },
+      "v1": { "v": 1, "t": "host.callState", "state": "IDLE" },
+      "v0": { "t": "callstate", "state": "IDLE" }
+    },
+    {
+      "name": "a Windows-only command has no v0 form and MUST NOT be sent to a legacy peer",
+      "command": { "kind": "system.restart" },
+      "v1": { "v": 1, "t": "system.restart" },
+      "v0": null
+    },
+    {
+      "name": "pointer.wheel has no v0 form",
+      "command": { "kind": "pointer.wheel", "x": 0.5, "y": 0.5, "dx": 0.0, "dy": 1.0 },
+      "v1": { "v": 1, "t": "pointer.wheel", "x": 0.5, "y": 0.5, "dx": 0.0, "dy": 1.0 },
+      "v0": null
+    }
+  ]
+}

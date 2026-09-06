@@ -353,6 +353,38 @@ public class ProtocolFixtureTests
     }
 
     [Fact]
+    public void The_version_is_judged_by_value_not_by_spelling()
+    {
+        // JSON has no integer type: 1 and 1.0 are the same number. This decoder used
+        // to additionally require that the raw text carried no '.', so a v1 peer
+        // whose encoder wrote "1.0" was silently dropped — and JS could not have
+        // implemented that rule at all, since JSON.parse collapses both spellings to
+        // one value before the decoder ever sees them. Judge the number, not the text.
+        foreach (var spelling in new[] { "1", "1.0", "1e0", "1.0e0" })
+        {
+            using var d = JsonDocument.Parse("{\"v\":" + spelling + ",\"t\":\"pointer.tap\",\"x\":0.5,\"y\":0.25}");
+            Assert.Equal(new Control.PointerTap(0.5, 0.25), ControlCodec.Decode(d.RootElement));
+        }
+
+        // A value that is not integral, not in range, or not a number is still refused.
+        foreach (var bad in new[] { "1.5", "0", "2", "-1", "0.5", "\"1\"", "true", "null" })
+        {
+            using var d = JsonDocument.Parse("{\"v\":" + bad + ",\"t\":\"pointer.tap\",\"x\":0.5,\"y\":0.25}");
+            Assert.True(ControlCodec.Decode(d.RootElement) is null, $"version {bad} must be refused");
+        }
+    }
+
+    [Fact]
+    public void Encoding_refuses_an_unknown_command()
+    {
+        // SystemAction and Opaque carry their kind as a string, so an unknown one is
+        // representable. It must not reach the wire.
+        Assert.Null(ControlCodec.Encode(new Control.SystemAction("system.selfDestruct")));
+        Assert.Null(ControlCodec.Encode(new Control.Opaque("not.a.command")));
+        Assert.NotNull(ControlCodec.Encode(new Control.SystemAction("system.restart")));
+    }
+
+    [Fact]
     public void Encode_vectors_and_dialect_downgrade()
     {
         using var fx = Fixtures.Load("control-v1.json");

@@ -1,0 +1,105 @@
+{
+  "_comment": [
+    "NORMATIVE cross-language fixtures for Techee device identity and signed transcripts.",
+    "Every Techee implementation (Node broker, Android/Kotlin, Windows/.NET) MUST reproduce",
+    "these byte-for-byte. If a language cannot reproduce a vector here, that language cannot",
+    "register against the broker and the divergence must be fixed before shipping.",
+    "",
+    "The keypair below is a THROWAWAY generated solely for this file. It is not, and must",
+    "never be, a real device identity. It is committed on purpose so all three languages can",
+    "sign and verify identical bytes without coordinating at test time."
+  ],
+
+  "key": {
+    "curve": "P-256 (secp256r1 / prime256v1)",
+    "publicKeyEncoding": "X.509 SubjectPublicKeyInfo DER, then standard base64 with padding, no line wrapping",
+    "privateKeyEncoding": "PKCS#8 DER, then standard base64 (test fixture only)",
+    "publicKeySpkiB64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXgrY+H6Tb5rXctHN1c47TS8NkI1MQY6wp69z48h3uwpR4O4lD5gCz9aN9Ecv2tiw3TmXPzExzRk499Y09NfmkA==",
+    "privateKeyPkcs8B64": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgbF7i/aoPRYrRA2Uo2UYE5T94WWGesu6cr87Ezffk1JahRANCAAReCtj4fpNvmtdy0c3VzjtNLw2QjUxBjrCnr3PjyHe7ClHg7iUPmALP1o30Ry/a2LDdOZc/MTHNGTj31jT01+aQ"
+  },
+
+  "deviceId": {
+    "_rule": "deviceId = lowercase hex of SHA-256 over the SPKI DER bytes. Not the raw EC point, not PEM, not base64url. Exactly 64 chars matching /^[0-9a-f]{64}$/.",
+    "expected": "fe0f69f9801c9030d0f638bca80bbf7fd8916ced6aa0c370c901832fc76a7af6"
+  },
+
+  "signature": {
+    "_rule": "ECDSA over P-256 with SHA-256, encoded as an ASN.1 DER SEQUENCE {INTEGER r, INTEGER s}, then standard base64. NOT IEEE-P1363 / raw r||s. Java 'SHA256withECDSA' and Node crypto.sign default to DER; .NET must request DSASignatureFormat.Rfc3279DerSequence explicitly.",
+    "_note": "ECDSA is randomised, so a fresh signature will differ from the one below. Implementations MUST verify this vector; they cannot be expected to reproduce it."
+  },
+
+  "transcripts": {
+    "_rule": "All Techee transcripts are UTF-8, LF-joined ('\\n'), with NO trailing newline. The first line is always a domain separator so a signature gathered under one protocol can never be replayed into another.",
+
+    "registration": {
+      "context": "techee-register-v1",
+      "layout": "context \\n deviceId \\n challengeB64",
+      "source": "server/src/auth.js registrationTranscript(); android RegistrationAuth.transcript()",
+      "vectors": [
+        {
+          "name": "pinned toy vector shared with server smoke test 6d and RegistrationAuthTest",
+          "deviceId": "device-1",
+          "challengeB64": "nonce-1",
+          "expectedUtf8": "techee-register-v1\ndevice-1\nnonce-1"
+        },
+        {
+          "name": "realistic vector, signable and verifiable with the fixture key",
+          "deviceId": "fe0f69f9801c9030d0f638bca80bbf7fd8916ced6aa0c370c901832fc76a7af6",
+          "challengeB64": "Zm9vYmFyMDEyMzQ1Njc4OWFiY2RlZmdoaWprbG1ub3A=",
+          "expectedUtf8": "techee-register-v1\nfe0f69f9801c9030d0f638bca80bbf7fd8916ced6aa0c370c901832fc76a7af6\nZm9vYmFyMDEyMzQ1Njc4OWFiY2RlZmdoaWprbG1ub3A=",
+          "signatureB64": "MEQCIA8BCjnN6ty8CrbDFk3vqO/9kOxc1j/6H0flG17nWO2SAiAj0MpCozGEVkeWKb1nehwPj+lIfH7GQgYNOQigx41gzw=="
+        }
+      ]
+    },
+
+    "peerAuth": {
+      "context": "techee-peer-auth-v1",
+      "layout": "context \\n challengerId \\n nonceB64",
+      "source": "android RegistrationAuth.kt object PeerAuth",
+      "vectors": [
+        {
+          "name": "pinned toy vector",
+          "challengerId": "device-1",
+          "nonceB64": "nonce-1",
+          "expectedUtf8": "techee-peer-auth-v1\ndevice-1\nnonce-1"
+        }
+      ]
+    },
+
+    "sdp": {
+      "context": "techee-sdp-v1",
+      "layout": "context \\n type \\n fromId \\n toId \\n fingerprintLine \\n hex(sha256(fullSdpUtf8))",
+      "source": "android webrtc/SdpAuth.kt transcript()",
+      "fingerprintRule": "The FIRST line whose leading-whitespace-trimmed form starts with 'a=fingerprint:', then .trim()'d. Trimming is required so a CRLF SDP does not leave a dangling \\r inside the signed bytes.",
+      "vectors": [
+        {
+          "name": "offer, LF-terminated SDP",
+          "type": "offer",
+          "fromId": "AAA",
+          "toId": "BBB",
+          "sdp": "v=0\no=- 1 1 IN IP4 0.0.0.0\ns=-\na=fingerprint:sha-256 AA:BB:CC\na=setup:actpass\n",
+          "expectedFingerprintLine": "a=fingerprint:sha-256 AA:BB:CC",
+          "expectedUtf8": "techee-sdp-v1\noffer\nAAA\nBBB\na=fingerprint:sha-256 AA:BB:CC\nc309fce34e9bfdfe91013e4d3553f586da2c2d21514ba6acde095863b7450257"
+        },
+        {
+          "name": "answer, CRLF SDP — the \\r must be trimmed out of the fingerprint line but MUST remain inside the SDP body digest",
+          "type": "answer",
+          "fromId": "BBB",
+          "toId": "AAA",
+          "sdp": "v=0\r\no=- 1 1 IN IP4 0.0.0.0\r\ns=-\r\na=fingerprint:sha-256 DD:EE:FF\r\n",
+          "expectedFingerprintLine": "a=fingerprint:sha-256 DD:EE:FF",
+          "expectedUtf8": "techee-sdp-v1\nanswer\nBBB\nAAA\na=fingerprint:sha-256 DD:EE:FF\n703c4fbc428631dd8a3cdeab28c76f8c22bafb400be6fcd0b4a7c369f5aa5e5b"
+        },
+        {
+          "name": "no fingerprint — transcript is undefined and the SDP is unsignable/unverifiable by design",
+          "type": "offer",
+          "fromId": "AAA",
+          "toId": "BBB",
+          "sdp": "v=0\ns=-\n",
+          "expectedFingerprintLine": null,
+          "expectNullTranscript": true
+        }
+      ]
+    }
+  }
+}

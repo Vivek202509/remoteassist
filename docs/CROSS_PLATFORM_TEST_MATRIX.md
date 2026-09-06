@@ -120,17 +120,20 @@ Each row is enforced by the same fixture in two or more languages.
 | B9 | Control decode, both dialects | `control-v1.json` | **PASS** | **PASS** | **PASS** |
 | B10 | Control reject vectors | `control-v1.json` | **PASS** | **PASS** | **PASS** |
 | B11 | Dialect downgrade + round trip | `control-v1.json` | **PASS** | **PASS** | **PASS** |
-| B12 | Raw ECDH secret (unhashed X) | `pairing.json` | **PASS**² | **PASS** | **PASS** |
-| B13 | **Safety number** | `pairing.json` | **PASS**² | **PASS** | **PASS** |
-| B14 | Controller proof transcript | `pairing.json` | **PASS**² | **PASS** | **PASS** |
-| B15 | Host proof transcript | `pairing.json` | **PASS**² | **PASS** | **PASS** |
-| B16 | P-256 SPKI DER is 91 bytes | `pairing.json` | **PASS**² | **PASS** | **PASS** |
+| B12 | Raw ECDH secret (unhashed X) | `pairing.json` | **PASS** | **PASS** | **PASS** |
+| B13 | **Safety number** | `pairing.json` | **PASS** | **PASS** | **PASS** |
+| B14 | Controller proof transcript | `pairing.json` | **PASS** | **PASS** | **PASS** |
+| B15 | Host proof transcript | `pairing.json` | **PASS** | **PASS** | **PASS** |
+| B16 | P-256 SPKI DER is 91 bytes | `pairing.json` | **PASS** | **PASS** | **PASS** |
 
 ¹ Covered by the pre-existing `RegistrationAuthTest` / `SdpAuthTest`, which pin the
 same literals with real P-256 keys rather than reading the fixture file. Wiring them to
 the fixtures directly is a small tidy-up, not a coverage gap.
 
-² Produced by Node when the fixture was generated; Kotlin and C# both verify it.
+B12–B16 previously read "produced by Node when the fixture was generated" in the JS
+column: Node wrote those vectors and never read them back, so they were pinned in two
+languages rather than three. `server/test/protocol.js` now derives the ECDH secret, the
+safety number and both proof transcripts from `pairing.json` independently.
 
 **B13 is the one that would fail visibly in front of a user.** The safety number is
 read aloud between two people, so if the platforms computed it differently, pairing

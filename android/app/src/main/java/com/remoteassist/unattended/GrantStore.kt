@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.remoteassist.protocol.Protocol
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
@@ -26,8 +27,12 @@ data class UnattendedGrant(
     val active: Boolean,
     val lastUsedAt: Long? = null,
 ) {
-    fun isExpired(now: Long = System.currentTimeMillis()) = expiresAt != null && expiresAt < now
-    fun isUsable(now: Long = System.currentTimeMillis()) = active && !isExpired(now)
+    /**
+     * Delegates to [Protocol.grantUsable] rather than re-deriving the rule, so the
+     * store and the cross-language contract cannot drift. `expiresAt = 0` is the
+     * epoch and therefore expired, not "never expires".
+     */
+    fun isUsable(now: Long = System.currentTimeMillis()) = Protocol.grantUsable(active, expiresAt, now)
 
     fun downgradeToViewOnly() = copy(scope = setOf(Scope.VIEW))
 
@@ -39,10 +44,23 @@ data class UnattendedGrant(
     }
 
     companion object {
+        /**
+         * Rebuild a grant from its persisted form.
+         *
+         * Unknown scope names are **dropped, not guessed at and not thrown on** —
+         * the rule `protocol/fixtures/capabilities.json` states for legacy scopes.
+         * `Scope.valueOf` threw here, so a single grant written by a newer build
+         * took down [GrantStore.load] for every grant on the device, and an
+         * unattended host would fail to arm with no way to recover but a reinstall.
+         * Dropping the token fails closed: the grant survives with less power.
+         */
         fun fromJson(o: JSONObject): UnattendedGrant {
             val scopes = mutableSetOf<Scope>()
-            val arr = o.getJSONArray("scope")
-            for (i in 0 until arr.length()) scopes.add(Scope.valueOf(arr.getString(i)))
+            val arr = o.optJSONArray("scope")
+            for (i in 0 until (arr?.length() ?: 0)) {
+                val name = arr!!.opt(i) as? String ?: continue
+                runCatching { Scope.valueOf(name) }.getOrNull()?.let { scopes.add(it) }
+            }
             return UnattendedGrant(
                 grantId = o.getString("grantId"),
                 controllerId = o.getString("controllerId"),
@@ -65,12 +83,21 @@ class GrantStore private constructor(private val prefs: SharedPreferences) {
 
     init { load() }
 
+    /**
+     * Read the persisted grants.
+     *
+     * A single unreadable entry is skipped rather than aborting the load. This runs
+     * from `init`, so a throw here propagated out of [create] and left an
+     * unattended host unable to start at all — the most fragile possible response
+     * to one corrupt record. Skipping fails closed: an unreadable grant confers
+     * nothing, and the rest still load.
+     */
     private fun load() {
         cache.clear()
         val raw = prefs.getString(KEY, null) ?: return
-        val arr = JSONArray(raw)
+        val arr = runCatching { JSONArray(raw) }.getOrNull() ?: return
         for (i in 0 until arr.length()) {
-            val g = UnattendedGrant.fromJson(arr.getJSONObject(i))
+            val g = runCatching { UnattendedGrant.fromJson(arr.getJSONObject(i)) }.getOrNull() ?: continue
             cache[g.grantId] = g
         }
     }

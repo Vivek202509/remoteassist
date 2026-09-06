@@ -104,7 +104,7 @@ Three terminals, all in the repo root:
 cd server; $env:PORT="8080"; node src/server.js
 
 # 2 — host
-$H = "windows\src\Techee.Windows.HostApp\bin\Release\net10.0\techee-host.exe"
+$H = "windows\src\Techee.Windows.HostApp\bin\Release\net10.0-windows\techee-host.exe"
 $C = "windows\src\Techee.Windows.ControllerApp\bin\Release\net10.0-windows\techee-ctl.exe"
 
 & $H identity                       # note the public key
@@ -168,7 +168,7 @@ here to keep it to two machines; a third machine works the same way.
 dotnet build windows/Techee.Windows.slnx -c Release
 ```
 
-Binaries land in `windows/src/Techee.Windows.HostApp/bin/Release/net10.0/techee-host.exe`
+Binaries land in `windows/src/Techee.Windows.HostApp/bin/Release/net10.0-windows/techee-host.exe`
 and `windows/src/Techee.Windows.ControllerApp/bin/Release/net10.0-windows/techee-ctl.exe`.
 
 ### 4.2 Start the broker, on H

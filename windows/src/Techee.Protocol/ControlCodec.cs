@@ -79,18 +79,25 @@ public static class ControlCodec
     {
         if (frame.ValueKind != JsonValueKind.Object) return null;
 
-        // Version gate. Absent means the legacy dialect; present must be an integer
-        // we support. A future version is refused rather than guessed at.
+        // Version gate. Absent means the legacy dialect; present must be a number we
+        // support. A future version is refused rather than guessed at.
+        //
+        // The test is on the VALUE, not the spelling. JSON has no integer type, so 1
+        // and 1.0 are the same number; this used to also require that the raw text
+        // carried no '.', which rejected a frame from an ordinary v1 peer purely
+        // because its encoder wrote a decimal point — and which JS cannot implement
+        // at all, since its parser cannot tell the two spellings apart.
         int version;
         if (!frame.TryGetProperty("v", out var vEl))
         {
             version = TecheeProtocol.LegacyVersion;
         }
-        else if (vEl.ValueKind == JsonValueKind.Number && vEl.TryGetInt32(out var v)
-                 && vEl.GetRawText().IndexOf('.') < 0)
+        else if (vEl.ValueKind == JsonValueKind.Number && vEl.TryGetDouble(out var d)
+                 && double.IsFinite(d) && d == Math.Floor(d)
+                 && d >= TecheeProtocol.MinProtocolVersion && d <= TecheeProtocol.ProtocolVersion)
         {
-            if (v < TecheeProtocol.MinProtocolVersion || v > TecheeProtocol.ProtocolVersion) return null;
-            version = v;
+            // Integral and in range. A fractional version is not one we speak.
+            version = (int)d;
         }
         else
         {

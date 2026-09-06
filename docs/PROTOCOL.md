@@ -426,8 +426,10 @@ permits(p) = usable && p ∈ normalize(grant) && p is a known permission
 ```
 
 `expiresAt: 0` is the Unix epoch — maximally expired — and is treated as such.
-*(The shipped `state.js` uses a truthiness guard and reads it as "never expires";
-`protocol.js` does not, and the fixture pins the correct behaviour.)*
+*(A truthiness guard on this field reads 0 as "never expires" and fails open. The
+broker's `findGrant` once did exactly that and gated unattended auto-join on the
+result; it now calls `protocol.grantUsable`, and the fixture pins the behaviour in
+all three languages.)*
 
 ### 6.3 Legacy grant migration
 
@@ -455,6 +457,14 @@ in all three test suites rather than left as a consequence of the table.
 - Bumping the version means **adding** messages or fields. It never means
   changing what a v1 message already means.
 - A frame with an unsupported `v` is **rejected, not guessed at**.
+- `v` is judged **by value, not by spelling**. JSON has no integer type, so `1`,
+  `1.0` and `1e0` are the same number and all name version 1. A receiver checks
+  that the value is integral and in range; it must not inspect how the number was
+  written. This is not a stylistic preference — a JS receiver *cannot* implement
+  the stricter rule, because `JSON.parse` collapses every spelling to one value
+  before the decoder runs, so a spelling-sensitive check is one that two of the
+  three implementations would enforce and the third would silently ignore. A
+  fractional version such as `1.5` is not a version we speak and is rejected.
 - A peer that only speaks v1 must be able to keep speaking v1 to a newer peer
   indefinitely.
 - **Version negotiation never affects authentication.** There is no

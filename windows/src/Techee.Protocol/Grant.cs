@@ -59,9 +59,9 @@ public sealed record Grant
     /// </summary>
     /// <remarks>
     /// <c>ExpiresAt</c> null means no expiry. A present value is honoured including
-    /// <c>0</c> — the Unix epoch, i.e. maximally expired. The shipped
-    /// <c>state.js</c> uses a truthiness guard and reads 0 as never-expiring; this
-    /// does not, and the fixture pins the fail-closed behaviour.
+    /// <c>0</c> — the Unix epoch, i.e. maximally expired. A truthiness guard on
+    /// this field reads 0 as never-expiring and fails open; this does not, and
+    /// the fixture pins the fail-closed behaviour.
     /// </remarks>
     public bool IsUsable(DateTimeOffset now) =>
         Active && (ExpiresAt is null || ExpiresAt.Value >= now.ToUnixTimeMilliseconds());

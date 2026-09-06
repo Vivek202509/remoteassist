@@ -134,7 +134,7 @@ function Get-ToolPath {
     Set-DotNetRoot
 
     if ($ForRole -eq 'Host') {
-        $path = Join-Path $RepoRoot "windows\src\Techee.Windows.HostApp\bin\$Configuration\net10.0\techee-host.exe"
+        $path = Join-Path $RepoRoot "windows\src\Techee.Windows.HostApp\bin\$Configuration\net10.0-windows\techee-host.exe"
     } else {
         $path = Join-Path $RepoRoot "windows\src\Techee.Windows.ControllerApp\bin\$Configuration\net10.0-windows\techee-ctl.exe"
     }
